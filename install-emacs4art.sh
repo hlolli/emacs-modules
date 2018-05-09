@@ -50,7 +50,8 @@ echo "After the installation is over, you can safely move back the parts that yo
 echo "from your original-emacs-d to the newly created ~/.emacs.d"
 echo ""
 echo "Note that files starting with a dot (like .emacs.d) wont be visible on some systems"
-echo "you may need to enable 'Show Hidden Files and Folders' or similar setting."
+echo "you may need to enable 'Show Hidden Files and Folders' or similar setting to see"
+echo "the directory."
 echo $(tput sgr0)
 echo ""
 
@@ -161,11 +162,11 @@ To revert back to your old Emacs configs simply:
     echo $(tput setaf 5)
     echo $(tput sgr0)
     echo ""
-    echo "# This loads emacs4art, make sure that this expression is always at the top of init.el
+    echo ";; This loads emacs4art, make sure that this expression is always at the top of init.el
 (load-file (expand-file-name (concat user-emacs-directory \"emacs4art/initialize.el\")))
 
-# Here below you can put your own configuration
-# for tips and tricks, go to https://github.com/panaeolus/emacs4art
+;; Here below you can put your own configuration
+;; for tips and tricks, go to https://github.com/panaeolus/emacs4art
 " > ~/.emacs.d/init.el 
     
     rm -rf $tmp_dir
