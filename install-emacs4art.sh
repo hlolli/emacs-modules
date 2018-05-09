@@ -108,7 +108,7 @@ To see which files have been preserved:
 To revert back to your old Emacs configs simply:
 
     rm -rf ~/.emacs.d
-    mv $old_config ~/.emacs.d" > $old_config/HOW_TO_RESTORE_YOUR_OLD_EMACS_CONFIG.md
+    mv $old_config/.emacs.d ~/.emacs.d" > $old_config/HOW_TO_RESTORE_YOUR_OLD_EMACS_CONFIG.md
 
             created_old_emacs_config_dir=true
         fi
@@ -156,11 +156,9 @@ To revert back to your old Emacs configs simply:
 
     echo $(tput setaf 2)"--> Installation Completed"$(tput sgr0)
     echo $(tput setaf 5)
-    cat $tmp_dir/outro.txt
     echo $(tput sgr0)
     echo ""
-    echo "
-# This loads emacs4art, make sure that this command is always at the top init.el
+    echo "# This loads emacs4art, make sure that this expression is always at the top of init.el
 (load-file (expand-file-name (concat user-emacs-directory \"emacs4art/initialize.el\")))
 
 # Here below you can put your own configuration
