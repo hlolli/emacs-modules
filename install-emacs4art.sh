@@ -48,6 +48,9 @@ echo "by moveing your ~/.emacs.d (if exists) to ~/original-emacs-d"
 echo ""
 echo "After the installation is over, you can safely move back the parts that you need"
 echo "from your original-emacs-d to the newly created ~/.emacs.d"
+echo ""
+echo "Note that files starting with a dot (like .emacs.d) wont be visible on some systems"
+echo "you may need to enable 'Show Hidden Files and Folders' or similar setting."
 echo $(tput sgr0)
 echo ""
 
