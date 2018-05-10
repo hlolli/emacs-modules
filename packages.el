@@ -170,6 +170,13 @@
   :bind (("C-x g"   . magit-status)
 	 ("C-x M-g" . magit-dispatch-popup)))
 
+;; Semi-graphical file explorer
+(use-package neotree
+  :ensure t
+  :config
+  (global-unset-key (kbd "C-x f"))
+  (global-set-key (kbd "C-x f") #'neotree))
+
 ;; Paredit mode for structural editing
 ;; makes sure the brackets always match
 ;; learn the commands http://pub.gajendra.net/src/paredit-refcard.pdf
