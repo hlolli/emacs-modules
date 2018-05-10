@@ -13,6 +13,8 @@
   :group 'emacs4art
   :type 'string)
 
+(defvar emacs4art-first-run-p nil)
+
 (require 'package)
 
 ;; Some global vars that need to be defined very early
@@ -32,6 +34,7 @@
 
 ;; First run of this emacs config
 (when (not (package-installed-p 'use-package))
+  (setq emacs4art-first-run-p t)
   (package-refresh-contents)
   (package-install 'use-package)
   ;; create tmp dir

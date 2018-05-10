@@ -6,6 +6,13 @@
   (setq aggressive-indent-excluded-modes
 	(cons 'cider-repl-mode aggressive-indent-excluded-modes)))
 
+
+(use-package all-the-icons
+  :ensure t
+  :config
+  (when emacs4art-first-run-p
+    (all-the-icons-install-fonts t)))
+
 ;; Every 4 days, try updateing the packages
 (use-package auto-package-update
   :ensure t
@@ -25,6 +32,20 @@
             (mode '(c-mode json-mode js-mode csound-mode c++-mode))
           (add-hook (intern (concat (symbol-name mode) "-hook"))
                     (lambda () (autopair-mode 1)))))
+
+
+;; (use-package celestial-mode-line
+;;   :disabled
+;;   :init
+;;   (unless (fboundp 'destructuring-bind)
+;;     (defalias 'destructuring-bind 'cl-destructuring-bind))
+;;   (unless (fboundp 'first)
+;;     (defalias 'first 'car))
+;;   (unless (fboundp 'second)
+;;     (defalias 'second (lambda (l) (car (cdr l)))))
+;;   (unless (fboundp 'third)
+;;     (defalias 'third (lambda (l) (car (cdr (cdr l))))))
+;;   :config (celestial-mode-line-start-timer))
 
 
 ;; The swiss-army knife for Clojure development
@@ -82,11 +103,14 @@
 (use-package css-mode
   :ensure t)
 
+;; :box '(:line-width -1 :color "#4c83ff")
 ;; Let's use the default Emacs-Live theme
 (use-package cyberpunk-theme
   :ensure t
-  :config (when (display-graphic-p)
-	    (load-theme 'cyberpunk t)))
+  :config
+  (when (display-graphic-p)
+    (load-theme 'cyberpunk t)))
+
 
 ;; Dim Emacs when it's out of focus
 (use-package dimmer
@@ -174,6 +198,7 @@
 (use-package neotree
   :ensure t
   :config
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
   (global-unset-key (kbd "C-x f"))
   (global-set-key (kbd "C-x f") #'neotree))
 
@@ -211,6 +236,21 @@
   :config
   (setq smex-save-file (concat user-emacs-directory "tmp/.smex-items")
         smex-history-length 40))
+
+(use-package spaceline
+  :ensure t
+  :config
+  (set-face-attribute
+   'powerline-active2 nil
+   :background "#000000" :foreground "#ffffff"))
+
+(use-package spaceline-all-the-icons
+  :ensure t
+  :after spaceline
+  :config (spaceline-all-the-icons-theme)
+  (setq spaceline-all-the-icons-icon-set-modified 'toggle)
+  (require 'spaceline-config)
+  (spaceline-emacs-theme))
 
 (use-package undo-tree
   :ensure t
