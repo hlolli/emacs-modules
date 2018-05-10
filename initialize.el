@@ -21,7 +21,14 @@
 
 (package-initialize)
 
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(setq package-archives
+      '(("gnu"     . "http://elpa.gnu.org/packages/")
+        ("melpa"   . "http://melpa.milkbox.net/packages/"))
+      package-archive-priorities
+      '(("gnu"     . 0)
+        ("melpa"   . 10)))
+
+;; (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 ;; First run of this emacs config
 (when (not (package-installed-p 'use-package))
@@ -50,5 +57,8 @@
 
 ;; Load other extras
 (load-file (expand-file-name "other.el" emacs4art-location))
+
+(load-file (expand-file-name "dircolors.el" emacs4art-location))
+
 
 ;; initialize.el ends here

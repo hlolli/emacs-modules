@@ -46,12 +46,12 @@
 
 ;; Try to load emacs4art-font it exists
 (let ((default-font (if (member emacs4art-font (font-family-list))
-			emacs4art-font "DejaVu Sans Mono")))
+                        emacs4art-font "DejaVu Sans Mono")))
   (set-face-attribute 'default nil
-		      :font default-font
-		      :height 120
-		      :weight 'normal
-		      :width 'normal)
+                      :font default-font
+                      :height 120
+                      :weight 'normal
+                      :width 'normal)
   ;; Enlarge just a tiny bit
   (text-scale-adjust +1))
 
@@ -60,9 +60,13 @@
       auto-save-list-file-prefix (concat user-emacs-directory "tmp/auto-save-list/.saves-")
       backup-directory-alist `(("." . ,(concat user-emacs-directory "tmp/autosaves")))
       custom-file (concat user-emacs-directory "tmp/custom.el")
+      custom-safe-themes t
       create-lockfiles nil
+      completion-show-inline-help nil
+      completion-auto-help nil 
       electric-indent-inhibit t
-      frame-title-format '((:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b")))      
+      frame-title-format '((:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b")))
+      gc-cons-threshold 20000000
       inhibit-startup-message t
       require-final-newline t
       ring-bell-function 'ignore
@@ -71,5 +75,9 @@
       scroll-margin 2 ;; nice scrolling
       scroll-conservatively 100000
       scroll-preserve-screen-position 1)
+
+
+;; Never make tabs (exception for Makefiles)
+(setq-default indent-tabs-mode nil)
 
 ;; globalvars.el ends here

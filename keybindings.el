@@ -11,3 +11,8 @@
 ;; replace the selected region via yank
 (global-set-key (kbd "C-x y") 'yank-replace)
 
+
+;; quickly move to the beginning or end of buffer
+(global-set-key (kbd "C-<") #'beginning-of-buffer)
+(global-set-key (kbd "C->") #'end-of-buffer)
+

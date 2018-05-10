@@ -19,6 +19,14 @@
   (auto-package-update-maybe))
 
 
+(use-package autopair
+  :ensure t
+  :init (dolist
+            (mode '(c-mode json-mode js-mode csound-mode c++-mode))
+          (add-hook (intern (concat (symbol-name mode) "-hook"))
+                    (lambda () (autopair-mode 1)))))
+
+
 ;; The swiss-army knife for Clojure development
 (use-package cider
   :ensure t
@@ -30,10 +38,7 @@
 		cider-repl-pop-to-buffer-on-connect 'display-only)
   :bind (:map cider-mode-map
               ("C-c C-b" . cider-eval-buffer)
-              ("C-c d"   . cider-print-docstring))
-  :init (add-hook 'cider-repl-mode
-		  (lambda ()
-		    (rainbow-delimiters-mode))))
+              ("C-c d"   . cider-print-docstring)))
 
 ;; Basic clojure-mode with indent rules etc.
 (use-package clojure-mode
@@ -50,11 +55,32 @@
 (use-package clojure-mode-extra-font-locking
   :ensure t)
 
+
+(use-package clj-refactor
+  :ensure t
+  :config (add-hook 'clojure-mode-hook #'clj-refactor-mode))
+
+
 ;; Powerful auto-completions
 (use-package company
   :ensure t
   :config
   (global-company-mode))
+
+(use-package cmake-mode
+  :ensure t
+  :mode (("CMakeLists.txt" . cmake-mode)
+	 ("\\.cmake\\'"    . cmake-mode)))
+
+(use-package csound-mode
+  :ensure t
+  :mode (("\\.csd\\'" . csound-mode)
+         ("\\.orc\\'" . csound-mode)
+         ("\\.sco\\'" . csound-mode)
+         ("\\.udo\\'" . csound-mode)))
+
+(use-package css-mode
+  :ensure t)
 
 ;; Let's use the default Emacs-Live theme
 (use-package cyberpunk-theme
@@ -65,12 +91,11 @@
 ;; Dim Emacs when it's out of focus
 (use-package dimmer
   :ensure t
-  :init (dimmer-mode))
-
+  :init (dimmer-mode)
+  :config (setq dimmer-fraction 0.35))
 
 ;; Flashing eval
 (use-package eval-sexp-fu
-  :disabled t
   :ensure t
   :init
   ;; (unless (fboundp 'multiple-value-bind)
@@ -93,9 +118,12 @@
 ;; Completions when finding files
 (use-package ido
   :ensure t
+  :init
+  (unbind-key " " ido-common-completion-map)
+  (unbind-key " " ido-completion-map)
   :config
-  (setq ido-enable-prefix nil
-        ido-enable-flex-matching t
+  (setq ido-enable-prefix t
+        ido-enable-flex-matching nil
         ido-use-filename-at-point nil
         ido-auto-merge-work-directories-length -1
         ido-use-virtual-buffers t
@@ -103,6 +131,21 @@
         (expand-file-name "ido.hist" (concat user-emacs-directory "tmp/")))
   (ido-mode t)
   (ido-everywhere 1))
+
+(use-package ido-vertical-mode
+  :ensure t
+  :config
+  (ido-vertical-mode 1)
+  (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
+	ido-vertical-show-count t))
+
+;; powerful git management
+;; docs: https://magit.vc/manual/magit/
+(use-package magit
+  :ensure t
+  :config (global-magit-file-mode)
+  :bind (("C-x g"   . magit-status)
+	 ("C-x M-g" . magit-dispatch-popup)))
 
 ;; Paredit mode for structural editing
 ;; makes sure the brackets always match
@@ -128,7 +171,9 @@
   :ensure t
   :config
   (add-hook 'eval-expression-minibuffer-setup-hook #'rainbow-delimiters-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'cider-repl-mode #'rainbow-delimiters-mode))
+
 
 (use-package smex
   :ensure t
@@ -137,6 +182,11 @@
   (setq smex-save-file (concat user-emacs-directory "tmp/.smex-items")))
 
 
+(use-package undo-tree
+  :ensure t
+  :config  (global-undo-tree-mode))
+
 (use-package yasnippet
   :ensure t
-  :config (yas-global-mode t))
+  :config (yas-global-mode t)
+  (add-hook 'clojure-mode-hook 'yas-minor-mode))

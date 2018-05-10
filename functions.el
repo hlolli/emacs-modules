@@ -90,3 +90,41 @@ buffer is not visiting a file."
     (delete-region pos1 pos2)
     (goto-char pos1)
     (insert myStrChomped)))
+
+(defun echo-active-modes ()
+  "Give a message of which minor modes are enabled in the current buffer."
+  (interactive)
+  (let ((active-modes))
+    (mapc (lambda (mode) (condition-case nil
+                             (if (and (symbolp mode) (symbol-value mode))
+                                 (add-to-list 'active-modes mode))
+                           (error nil) ))
+          minor-mode-list)
+    (message "Active modes are %s" active-modes)))
+
+
+(defun rename-file-and-buffer ()
+  "Rename the current buffer and file it is visiting."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (message "Buffer is not visiting a file!")
+      (let ((new-name (read-file-name "New name: " filename)))
+        (cond
+         ((vc-backend filename) (vc-rename-file filename new-name))
+         (t
+          (rename-file filename new-name t)
+          (set-visited-file-name new-name t t)))))))
+
+(defun delete-file-and-buffer ()
+  "Kill the current buffer and deletes the file it is visiting."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (when filename
+      (when (yes-or-no-p (format "Are you sure you want to delete? %s" filename))
+	(if (vc-backend filename)
+	    (vc-delete-file filename)
+	  (progn
+	    (delete-file filename)
+	    (message "Deleted file %s" filename)
+	    (kill-buffer)))))))
