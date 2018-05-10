@@ -39,7 +39,16 @@
 ;; Load packages
 (load-file (expand-file-name "packages.el" emacs4art-location))
 
+;; Load functions
+(load-file (expand-file-name "functions.el" emacs4art-location))
+
+;; Load keybindings
+(load-file (expand-file-name "keybindings.el" emacs4art-location))
+
 ;; Load global config
 (load-file (expand-file-name "global.el" emacs4art-location))
+
+;; Load other extras
+(load-file (expand-file-name "other.el" emacs4art-location))
 
 ;; initialize.el ends here

@@ -30,19 +30,25 @@
 		cider-repl-pop-to-buffer-on-connect 'display-only)
   :bind (:map cider-mode-map
               ("C-c C-b" . cider-eval-buffer)
-              ("C-c d"   . cider-print-docstring)))
+              ("C-c d"   . cider-print-docstring))
+  :init (add-hook 'cider-repl-mode
+		  (lambda ()
+		    (rainbow-delimiters-mode))))
 
 ;; Basic clojure-mode with indent rules etc.
 (use-package clojure-mode
   :ensure t
-  :init
-  (add-hook 'clojure-mode-hook
-            (lambda ()
-              (paredit-mode)
-              (eldoc-mode t)
-              (rainbow-delimiters-mode)
-              (flycheck-mode 1))))
+  :config
+  (setq clojure-align-forms-automatically t)
+  ;; :init
+  ;; (add-hook
+  ;;  'clojure-mode-hook
+  ;;  (lambda ()
+  ;;    (eldoc-mode t)))
+  )
 
+(use-package clojure-mode-extra-font-locking
+  :ensure t)
 
 ;; Powerful auto-completions
 (use-package company
@@ -110,7 +116,8 @@
   (add-hook 'ielm-mode-hook #'paredit-mode)
   (add-hook 'lisp-mode-hook #'paredit-mode)
   (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
-  (add-hook 'cider-repl-mode-hook #'paredit-mode))
+  (add-hook 'cider-repl-mode-hook #'paredit-mode)
+  (add-hook 'clojure-mode-hook #'paredit-mode))
 
 ;; Highlight matching parenthesis
 (use-package paren
@@ -118,7 +125,10 @@
   (show-paren-mode +1))
 
 (use-package rainbow-delimiters
-  :ensure t)
+  :ensure t
+  :config
+  (add-hook 'eval-expression-minibuffer-setup-hook #'rainbow-delimiters-mode)
+  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
 
 (use-package smex
   :ensure t
