@@ -198,9 +198,31 @@
 (use-package neotree
   :ensure t
   :config
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow)
+        neo-mode-line-type 'none
+        neo-smart-open t
+        neo-show-hidden-files t
+        neo-cwd-line-style 'none
+        neo-click-changes-root t)
+  
+  (defun neontree-updir ()
+    (interactive)
+    (prog2
+        (save-excursion
+          (neo-global--open-dir
+           (neo-path--updir
+            (neo-path--get-working-dir))))
+        (next-line 2)))
+  
+  (add-hook 'neo-enter-hook
+            (lambda (type & r) (if (equal type 'file)
+                                   (neotree-hide))))
+  
   (global-unset-key (kbd "C-x f"))
-  (global-set-key (kbd "C-x f") #'neotree))
+  (global-set-key (kbd "C-x f") #'neotree)
+  (define-key neotree-mode-map
+    (kbd "<backspace>")
+    'neontree-updir))
 
 ;; Paredit mode for structural editing
 ;; makes sure the brackets always match
