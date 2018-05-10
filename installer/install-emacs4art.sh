@@ -6,8 +6,6 @@
 
 old_config=~/original-emacs-d
 tmp_dir=~/.emacs-4art-tmp
-username=$(whoami)
-
 
 if [[ -e $old_config ]]; then
 
@@ -39,19 +37,16 @@ if type -p curl >/dev/null 2>&1; then
     HTTP_CLIENT="curl $CURL_PROXY -f -k -L -o"
 fi
 
+# Download init.el, intro and outro text
+$HTTP_CLIENT $tmp_dir/intro.txt https://raw.github.com/overtone/emacs4art/master/installer/intro.txt
+$HTTP_CLIENT $tmp_dir/outro.txt https://raw.github.com/overtone/emacs4art/master/installer/outro.txt
+$HTTP_CLIENT $tmp_dir/init.el   https://raw.github.com/overtone/emacs4art/master/installer/default-init.el
+
 # Print outro and ask for user confirmation to continue
 echo ""
 echo ""
 echo $(tput setaf 4)
-echo "WARNING: This will disable (not remove!) all your personal emacs configuration"
-echo "by moveing your ~/.emacs.d (if exists) to ~/original-emacs-d"
-echo ""
-echo "After the installation is over, you can safely move back the parts that you need"
-echo "from your original-emacs-d to the newly created ~/.emacs.d"
-echo ""
-echo "Note that files starting with a dot (like .emacs.d) wont be visible on some systems"
-echo "you may need to enable 'Show Hidden Files and Folders' or similar setting to see"
-echo "the directory."
+cat $tmp_dir/intro.txt
 echo $(tput sgr0)
 echo ""
 
@@ -64,7 +59,7 @@ function download_tarball {
     $HTTP_CLIENT $tmp_dir/emacs4art.zip https://github.com/panaeolus/emacs4art/zipball/master
 
     # Unzip zipball
-    unzip $tmp_dir/live.zip -d $tmp_dir/
+    unzip $tmp_dir/emacs4art.zip -d $tmp_dir/
 }
 
 function git_clone {

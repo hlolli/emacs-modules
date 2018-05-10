@@ -1,0 +1,92 @@
+
+(defun comment-or-uncomment-region-or-line ()
+  "Comments or uncomments the region or the current line if there's no active region."
+  (interactive)
+  (let (beg end)
+    (if (region-active-p)
+        (setq beg (region-beginning) end (region-end))
+      (setq beg (line-beginning-position) end (line-end-position)))
+    (comment-or-uncomment-region beg end)))
+
+;; Vim style increment
+(defun increment-number-decimal (&optional arg)
+  "Increment the number forward from point by 'arg'."
+  (interactive "p*")
+  (save-excursion
+    (save-match-data
+      (let (inc-by field-width answer)
+        (setq inc-by (if arg arg 1))
+        (skip-chars-backward "0123456789")
+        (when (re-search-forward "[0-9]+" nil t)
+          (setq field-width (- (match-end 0) (match-beginning 0)))
+          (setq answer (+ (string-to-number (match-string 0) 10) inc-by))
+          (when (< answer 0)
+            (setq answer (+ (expt 10 field-width) answer)))
+          (replace-match (format (concat "%0" (int-to-string field-width) "d")
+                                 answer)))))))
+
+(defun decrement-number-decimal (&optional arg)
+  (interactive "p*")
+  (my-increment-number-decimal (if arg (- arg) -2)))
+
+(defun sudo-edit (&optional arg)
+  "Edit currently visited file as root.
+With a prefix ARG prompt for a file to visit.
+Will also prompt for a file to visit if current
+buffer is not visiting a file."
+  (interactive "P")
+  (if (or arg (not buffer-file-name))
+      (find-file (concat "/sudo:root@localhost:"
+                         (ido-read-file-name "Find file(as root): ")))
+    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+
+
+;; Resize the buffer window if more than 1 is in view
+(defun enlarge-window-horizontally--double ()
+  (interactive)
+  (enlarge-window-horizontally 10))
+
+(defun shrink-window-horizontally--double ()
+  (interactive)
+  (shrink-window-horizontally 10))
+
+(defun shrink-window--double ()
+  (interactive)
+  (shrink-window 10))
+
+(defun enlarge-window--double ()
+  (interactive)
+  (enlarge-window 10))
+
+;; replace the selected region with yank
+(defun yank-replace (beg end)
+  (interactive "r")
+  (delete-region beg end)
+  (yank))
+
+(defun indent-buffer () 
+  "Indent the currently visited buffer."
+  (interactive)
+  (indent-region (point-min) (point-max)))
+
+(defun chomp (str)
+  "Chomp leading and tailing whitespace from STR."
+  (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
+                       str)
+    (setq str (replace-match "" t t str)))
+  str)
+
+(defun chomp-line-or-region ()
+  "Remove leading and traling whitespace from current line or region."
+  (interactive)
+  (let (pos1 pos2 bds)
+    (if (region-active-p)
+        (setq pos1 (region-beginning) pos2 (region-end))
+      (progn
+        (setq bds (bounds-of-thing-at-point 'line))
+        (setq pos1 (car bds) pos2 (cdr bds))))
+    (setq myStr (buffer-substring pos1 pos2))
+    (setq myStrChomped (chomp myStr))
+    (delete-region pos1 pos2)
+    (goto-char pos1)
+    (insert myStrChomped)))

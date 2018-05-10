@@ -64,10 +64,11 @@
 
 ;; Flashing eval
 (use-package eval-sexp-fu
+  :disabled t
   :ensure t
   :init
-  (unless (fboundp 'multiple-value-bind)
-    (defalias 'multiple-value-bind 'cl-multiple-value-bind))
+  ;; (unless (fboundp 'multiple-value-bind)
+  ;;   (defalias 'multiple-value-bind 'cl-multiple-value-bind))
   (add-hook 'emacs-lisp-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
   (add-hook 'emacs-lisp-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
   (add-hook 'clojure-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
