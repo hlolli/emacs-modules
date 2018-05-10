@@ -58,7 +58,5 @@
 ;; Load other extras
 (load-file (expand-file-name "other.el" emacs4art-location))
 
-(load-file (expand-file-name "dircolors.el" emacs4art-location))
-
 
 ;; initialize.el ends here

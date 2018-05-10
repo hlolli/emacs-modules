@@ -12,3 +12,16 @@
 
 (add-hook 'css-mode-hook #'hexcolour-add-to-font-lock)
 (add-hook 'scss-mode-hook #'hexcolour-add-to-font-lock)
+
+(defun delete-completion-window-buffer (&optional output)                                                                
+  (interactive)                                                                                                
+  (dolist (win (window-list))                                                                                  
+    (when (string= (buffer-name (window-buffer win)) "*Completions*")
+      (delete-window win)
+      (kill-buffer "*Completions*"))
+    (when (string= (buffer-name (window-buffer win)) "*Ido Completions*")
+      (delete-window win)
+      (kill-buffer "*Ido Completions*")))
+  output)                                                                                                      
+
+(add-hook 'comint-preoutput-filter-functions 'delete-completion-window-buffer)

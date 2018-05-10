@@ -98,8 +98,8 @@
 (use-package eval-sexp-fu
   :ensure t
   :init
-  ;; (unless (fboundp 'multiple-value-bind)
-  ;;   (defalias 'multiple-value-bind 'cl-multiple-value-bind))
+  (unless (fboundp 'multiple-value-bind)
+    (defalias 'multiple-value-bind 'cl-multiple-value-bind))
   (add-hook 'emacs-lisp-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
   (add-hook 'emacs-lisp-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
   (add-hook 'clojure-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
@@ -122,13 +122,26 @@
   (unbind-key " " ido-common-completion-map)
   (unbind-key " " ido-completion-map)
   :config
-  (setq ido-enable-prefix t
+  (setq ido-enable-prefix nil
         ido-enable-flex-matching nil
         ido-use-filename-at-point nil
         ido-auto-merge-work-directories-length -1
         ido-use-virtual-buffers t
         ido-save-directory-list-file
         (expand-file-name "ido.hist" (concat user-emacs-directory "tmp/")))
+  ;; Block annoying ido popup on space
+  (defun ido-complete-space () (interactive))
+  (custom-set-faces
+   ;; Face used by ido for highlighting subdirs in the alternatives.
+   '(ido-subdir ((t (:foreground "#7b68ee"))))
+   ;; Face used by ido for highlighting first match.
+   '(ido-first-match ((t (:foreground "#ff69b4"))))
+   ;; Face used by ido for highlighting only match.
+   '(ido-only-match ((t (:foreground "#ffcc33"))))
+   ;; Face used by ido for highlighting its indicators (don't actually use this)
+   '(ido-indicator ((t (:foreground "#ffffff"))))
+   ;; Ido face for indicating incomplete regexps. (don't use this either)
+   '(ido-incomplete-regexp ((t (:foreground "#ffffff")))))
   (ido-mode t)
   (ido-everywhere 1))
 
@@ -137,7 +150,17 @@
   :config
   (ido-vertical-mode 1)
   (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
-	ido-vertical-show-count t))
+	ido-vertical-show-count t
+	ido-use-faces t)
+  (set-face-attribute 'ido-vertical-first-match-face nil
+		      :background "#262626")
+  (set-face-attribute 'ido-vertical-only-match-face nil
+		      :background "#e52b50"
+		      :foreground "black"
+		      )
+  (set-face-attribute 'ido-vertical-match-face nil
+		      :foreground "#000000"
+		      ))
 
 ;; powerful git management
 ;; docs: https://magit.vc/manual/magit/
@@ -179,8 +202,8 @@
   :ensure t
   :bind ("M-x" . smex)
   :config
-  (setq smex-save-file (concat user-emacs-directory "tmp/.smex-items")))
-
+  (setq smex-save-file (concat user-emacs-directory "tmp/.smex-items")
+        smex-history-length 40))
 
 (use-package undo-tree
   :ensure t
