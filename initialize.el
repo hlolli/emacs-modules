@@ -3,7 +3,7 @@
   :version "1.0.0")
 
 (defcustom emacs4art-location (concat user-emacs-directory "emacs4art")
-  "Directory location of emacs 4 artists, defaults to ~/.emacs.d/emacs4art"
+  "Directory location of Emacs 4 artists, defaults to ~/.emacs.d/emacs4art"
   :group 'emacs4art
   :type 'string)
 
@@ -16,6 +16,7 @@
 (defvar emacs4art-first-run-p nil)
 
 (require 'package)
+(require 'cl)
 
 ;; Some global vars that need to be defined very early
 (setq package--init-file-ensured t

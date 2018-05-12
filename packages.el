@@ -56,26 +56,26 @@
                 ;; Change nil to t enable the welcome message in Cider
                 cider-repl-display-help-banner nil
                 cider-repl-wrap-history t
-		cider-repl-pop-to-buffer-on-connect 'display-only)
+		cider-repl-pop-to-buffer-on-connect 'display-only
+                cider-show-error-buffer 'only-in-repl
+                ;; nrepl-prompt-to-kill-server-buffer-on-quit nil
+                )
   :bind (:map cider-mode-map
               ("C-c C-b" . cider-eval-buffer)
               ("C-c d"   . cider-print-docstring)))
+
+
+(use-package cider-eval-sexp-fu
+  :ensure t)
 
 ;; Basic clojure-mode with indent rules etc.
 (use-package clojure-mode
   :ensure t
   :config
-  (setq clojure-align-forms-automatically t)
-  ;; :init
-  ;; (add-hook
-  ;;  'clojure-mode-hook
-  ;;  (lambda ()
-  ;;    (eldoc-mode t)))
-  )
+  (setq clojure-align-forms-automatically t))
 
 (use-package clojure-mode-extra-font-locking
   :ensure t)
-
 
 (use-package clj-refactor
   :ensure t
@@ -129,6 +129,56 @@
   (add-hook 'clojure-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
   (add-hook 'cider-repl-mode-hook #'turn-on-eval-sexp-fu-flash-mode))
 
+
+(use-package flycheck-clojure
+  :ensure t
+  :config
+  (setq flycheck-highlighting-mode 'columns)
+  (eval-after-load 'flycheck '(flycheck-clojure-setup))
+  ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+  (add-hook 'cider-mode-hook
+            (lambda ()
+              (setq next-error-function #'flycheck-next-error-function))))
+
+;; (use-package flycheck-pos-tip
+;;   :ensure t
+;;   :config
+;;   (eval-after-load 'flycheck
+;;     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+
+(defun download-symbola-font () 
+  (let* ((font-dest (cl-case window-system
+                      (x  (concat (or (getenv "XDG_DATA_HOME")
+                                      (concat (getenv "HOME") "/.local/share"))
+                                  "/fonts/"))
+                      (mac (concat (getenv "HOME") "/Library/Fonts/" ))
+                      (ns (concat (getenv "HOME") "/Library/Fonts/" ))))
+         (known-dest? (stringp font-dest))
+         (font-dest (or font-dest (read-directory-name "Font installation directory: " "~/"))))
+    (unless (file-directory-p font-dest) (mkdir font-dest t))
+    (url-copy-file "https://github.com/stv0g/unicode-emoji/blob/master/symbola/Symbola.ttf?raw=true"
+                   (expand-file-name "Symbola.ttf" font-dest) t)
+    (when known-dest?
+      (message "Fonts downloaded, updating font cache... <fc-cache -f -v> ")
+      (shell-command-to-string (format "fc-cache -f -v")))
+    (message "Successfully %s `Symbola' fonts to `%s'!"
+             (if known-dest? "installed" "downloaded")
+             font-dest)))
+
+;; (use-package flycheck-status-emoji
+;;   :ensure t
+;;   :init
+;;   (unless (member "Symbola" (font-family-list))
+;;     (download-symbola-font))
+;;   (set-fontset-font "fontset-default" nil
+;;                     (font-spec :size 20 :name "Symbola"))
+;;   (flycheck-status-emoji-mode t))
+
+(use-package flycheck-color-mode-line
+  :ensure t
+  :config
+  (eval-after-load "flycheck"
+    '(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)))
 
 ;; Show pre-written text in autocompletions
 (use-package flx-ido

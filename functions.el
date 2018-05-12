@@ -128,3 +128,6 @@ buffer is not visiting a file."
 	    (delete-file filename)
 	    (message "Deleted file %s" filename)
 	    (kill-buffer)))))))
+
+
+;; functions.el ends here

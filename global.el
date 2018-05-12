@@ -67,6 +67,7 @@
       electric-indent-inhibit t
       frame-title-format '((:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b")))
       gc-cons-threshold 20000000
+      help-window-select t
       inhibit-startup-message t
       require-final-newline t
       ring-bell-function 'ignore

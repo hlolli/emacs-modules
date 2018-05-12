@@ -13,8 +13,9 @@
 (add-hook 'css-mode-hook #'hexcolour-add-to-font-lock)
 (add-hook 'scss-mode-hook #'hexcolour-add-to-font-lock)
 
-(defun delete-completion-window-buffer (&optional output)                                                                
-  (interactive)                                                                                                
+(defun delete-completion-window-buffer (&optional output)
+  "Function for auto-deleteing window buffer."
+  (interactive "P") 
   (dolist (win (window-list))                                                                                  
     (when (string= (buffer-name (window-buffer win)) "*Completions*")
       (delete-window win)
