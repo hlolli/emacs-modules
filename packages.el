@@ -129,6 +129,11 @@
   (add-hook 'clojure-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
   (add-hook 'cider-repl-mode-hook #'turn-on-eval-sexp-fu-flash-mode))
 
+(use-package exec-path-from-shell-initialize
+  :ensure t
+  :config
+  (when (memq window-system '(mac))
+    (exec-path-from-shell-initialize)))
 
 (use-package flycheck-clojure
   :ensure t
