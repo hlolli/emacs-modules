@@ -47,6 +47,8 @@
 ;; Try to load emacs4art-font it exists
 (let ((default-font (if (member emacs4art-font (font-family-list))
                         emacs4art-font "DejaVu Sans Mono")))
+  (unless (member "Fira Mono" (font-family-list))
+    (emacs4art-download-fira-mono-font))
   (set-face-attribute 'default nil
                       :font default-font
                       :height 120

@@ -146,24 +146,6 @@
 ;;   (eval-after-load 'flycheck
 ;;     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
-(defun download-symbola-font () 
-  (let* ((font-dest (cl-case window-system
-                      (x  (concat (or (getenv "XDG_DATA_HOME")
-                                      (concat (getenv "HOME") "/.local/share"))
-                                  "/fonts/"))
-                      (mac (concat (getenv "HOME") "/Library/Fonts/" ))
-                      (ns (concat (getenv "HOME") "/Library/Fonts/" ))))
-         (known-dest? (stringp font-dest))
-         (font-dest (or font-dest (read-directory-name "Font installation directory: " "~/"))))
-    (unless (file-directory-p font-dest) (mkdir font-dest t))
-    (url-copy-file "https://github.com/stv0g/unicode-emoji/blob/master/symbola/Symbola.ttf?raw=true"
-                   (expand-file-name "Symbola.ttf" font-dest) t)
-    (when known-dest?
-      (message "Fonts downloaded, updating font cache... <fc-cache -f -v> ")
-      (shell-command-to-string (format "fc-cache -f -v")))
-    (message "Successfully %s `Symbola' fonts to `%s'!"
-             (if known-dest? "installed" "downloaded")
-             font-dest)))
 
 ;; (use-package flycheck-status-emoji
 ;;   :ensure t
