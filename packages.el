@@ -58,6 +58,7 @@
                 cider-repl-wrap-history t
 		cider-repl-pop-to-buffer-on-connect 'display-only
                 cider-show-error-buffer 'only-in-repl
+                cider-eldoc-display-for-symbol-at-point nil
                 ;; nrepl-prompt-to-kill-server-buffer-on-quit nil
                 )
   :bind (:map cider-mode-map
@@ -223,6 +224,11 @@
 		      :foreground "#000000"
 		      ))
 
+(use-package json-mode
+  :ensure t
+  :mode (("\\.json\\'" . json-mode)))
+
+
 ;; powerful git management
 ;; docs: https://magit.vc/manual/magit/
 (use-package magit
@@ -314,6 +320,11 @@
 (use-package undo-tree
   :ensure t
   :config  (global-undo-tree-mode))
+
+(use-package web-mode
+  :ensure t
+  :config (electric-indent-mode -1)
+  :mode (("\\.ts$" . web-mode)))
 
 (use-package yasnippet
   :ensure t

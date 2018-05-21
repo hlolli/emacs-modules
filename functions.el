@@ -27,7 +27,7 @@
 
 (defun decrement-number-decimal (&optional arg)
   (interactive "p*")
-  (my-increment-number-decimal (if arg (- arg) -2)))
+  (increment-number-decimal (if arg (- arg) -2)))
 
 (defun sudo-edit (&optional arg)
   "Edit currently visited file as root.
