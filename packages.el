@@ -4,7 +4,7 @@
   :ensure t
   :config (global-aggressive-indent-mode t)
   (setq aggressive-indent-excluded-modes
-	(cons 'cider-repl-mode aggressive-indent-excluded-modes)))
+        (cons 'cider-repl-mode aggressive-indent-excluded-modes)))
 
 
 (use-package all-the-icons
@@ -19,10 +19,10 @@
   :config
   (setq auto-package-update-delete-old-versions t
         auto-package-update-interval 4
-	apu--last-update-day-path
-	(expand-file-name
-	 apu--last-update-day-filename
-	 (concat user-emacs-directory "tmp")))
+        apu--last-update-day-path
+        (expand-file-name
+         apu-last-update-day-filename
+         (concat user-emacs-directory "tmp")))
   (auto-package-update-maybe))
 
 
@@ -52,18 +52,18 @@
 (use-package cider
   :ensure t
   :config (setq cider-repl-history-file
-		(concat user-emacs-directory "tmp/cider-history")
+                (concat user-emacs-directory "tmp/cider-history")
                 ;; Change nil to t enable the welcome message in Cider
                 cider-repl-display-help-banner nil
                 cider-repl-wrap-history t
-		cider-repl-pop-to-buffer-on-connect 'display-only
+                cider-repl-pop-to-buffer-on-connect 'display-only
                 cider-show-error-buffer 'only-in-repl
                 cider-eldoc-display-for-symbol-at-point nil
                 ;; nrepl-prompt-to-kill-server-buffer-on-quit nil
                 )
-  :bind (:map cider-mode-map
-              ("C-c C-b" . cider-eval-buffer)
-              ("C-c d"   . cider-print-docstring)))
+  ;; :init (unbind-key "C-c C-b" 'cider-mode-map)
+  :bind (("C-c M-b" . cider-eval-buffer)
+         ("C-c d"   . cider-print-docstring)))
 
 
 (use-package cider-eval-sexp-fu
@@ -89,10 +89,15 @@
   :config
   (global-company-mode))
 
+(use-package company-tern
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-tern))
+
 (use-package cmake-mode
   :ensure t
   :mode (("CMakeLists.txt" . cmake-mode)
-	 ("\\.cmake\\'"    . cmake-mode)))
+         ("\\.cmake\\'"    . cmake-mode)))
 
 (use-package csound-mode
   :ensure t
@@ -212,17 +217,17 @@
   :config
   (ido-vertical-mode 1)
   (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right
-	ido-vertical-show-count t
-	ido-use-faces t)
+        ido-vertical-show-count t
+        ido-use-faces t)
   (set-face-attribute 'ido-vertical-first-match-face nil
-		      :background "#262626")
+                      :background "#262626")
   (set-face-attribute 'ido-vertical-only-match-face nil
-		      :background "#e52b50"
-		      :foreground "black"
-		      )
+                      :background "#e52b50"
+                      :foreground "black"
+                      )
   (set-face-attribute 'ido-vertical-match-face nil
-		      :foreground "#000000"
-		      ))
+                      :foreground "#000000"
+                      ))
 
 (use-package json-mode
   :ensure t
@@ -239,7 +244,7 @@
   :ensure t
   :config (global-magit-file-mode)
   :bind (("C-x g"   . magit-status)
-	 ("C-x M-g" . magit-dispatch-popup)))
+         ("C-x M-g" . magit-dispatch-popup)))
 
 ;; Semi-graphical file explorer
 (use-package neotree
@@ -298,6 +303,8 @@
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'cider-repl-mode #'rainbow-delimiters-mode))
 
+(use-package sesman
+  :ensure t)
 
 (use-package smex
   :ensure t
@@ -321,6 +328,21 @@
   (require 'spaceline-config)
   (spaceline-emacs-theme))
 
+
+(use-package typescript-mode
+  :ensure t
+  :mode (("\\.ts$" . web-mode)
+         ("\\.tsx$" . web-mode)))
+
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save))
+  :mode (("\\.ts$" . web-mode)
+         ("\\.tsx$" . web-mode)))
+
 (use-package undo-tree
   :ensure t
   :config  (global-undo-tree-mode))
@@ -328,7 +350,8 @@
 (use-package web-mode
   :ensure t
   :config (electric-indent-mode -1)
-  :mode (("\\.ts$" . web-mode)))
+  :mode (("\\.ts$" . web-mode)
+         ("\\.tsx$" . web-mode)))
 
 (use-package yasnippet
   :ensure t
