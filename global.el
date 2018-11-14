@@ -76,10 +76,7 @@
       require-final-newline t
       ring-bell-function 'ignore
       savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
-      savehist-file (concat user-emacs-directory "tmp/savehist")
-      scroll-margin 2 ;; nice scrolling
-      scroll-conservatively 100000
-      scroll-preserve-screen-position 1)
+      savehist-file (concat user-emacs-directory "tmp/savehist"))
 
 
 ;; Never make tabs (exception for Makefiles)

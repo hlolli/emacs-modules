@@ -15,37 +15,29 @@
 
 ;; Every 4 days, try updateing the packages
 (use-package auto-package-update
-  :ensure t
+  :disabled
+  ;; :ensure t
   :config
   (setq auto-package-update-delete-old-versions t
         auto-package-update-interval 4
-        apu--last-update-day-path
-        (expand-file-name
-         apu-last-update-day-filename
-         (concat user-emacs-directory "tmp")))
-  (auto-package-update-maybe))
+        ;; apu--last-update-day-path
+        ;; (expand-file-name
+        ;;  apu-last-update-day-filename
+        ;;  (concat user-emacs-directory "tmp"))
+        )
+  ;;(auto-package-update-maybe)
+  )
 
 
 (use-package autopair
   :ensure t
   :init (dolist
-            (mode '(c-mode json-mode js-mode csound-mode c++-mode))
+            (mode '(c-mode
+                    json-mode js-mode
+                    csound-mode c++-mode
+                    typescript-mode web-mode))
           (add-hook (intern (concat (symbol-name mode) "-hook"))
                     (lambda () (autopair-mode 1)))))
-
-
-;; (use-package celestial-mode-line
-;;   :disabled
-;;   :init
-;;   (unless (fboundp 'destructuring-bind)
-;;     (defalias 'destructuring-bind 'cl-destructuring-bind))
-;;   (unless (fboundp 'first)
-;;     (defalias 'first 'car))
-;;   (unless (fboundp 'second)
-;;     (defalias 'second (lambda (l) (car (cdr l)))))
-;;   (unless (fboundp 'third)
-;;     (defalias 'third (lambda (l) (car (cdr (cdr l))))))
-;;   :config (celestial-mode-line-start-timer))
 
 
 ;; The swiss-army knife for Clojure development
@@ -72,15 +64,17 @@
 ;; Basic clojure-mode with indent rules etc.
 (use-package clojure-mode
   :ensure t
+  :init (eldoc-mode t)
+  (paredit-mode t)
   :config
   (setq clojure-align-forms-automatically t))
 
 (use-package clojure-mode-extra-font-locking
   :ensure t)
 
-(use-package clj-refactor
-  :ensure t
-  :config (add-hook 'clojure-mode-hook #'clj-refactor-mode))
+;; (use-package clj-refactor
+;;   :ensure t
+;;   :config (add-hook 'clojure-mode-hook #'clj-refactor-mode))
 
 
 ;; Powerful auto-completions
@@ -100,6 +94,7 @@
          ("\\.cmake\\'"    . cmake-mode)))
 
 (use-package csound-mode
+  :disabled
   :ensure t
   :mode (("\\.csd\\'" . csound-mode)
          ("\\.orc\\'" . csound-mode)
@@ -124,6 +119,11 @@
   :init (dimmer-mode)
   :config (setq dimmer-fraction 0.35))
 
+(use-package eshell-git-prompt
+  :ensure t :defer t
+  :init
+  (eshell-git-prompt-use-theme 'powerline))
+
 ;; Flashing eval
 (use-package eval-sexp-fu
   :ensure t
@@ -141,15 +141,22 @@
   (when (memq window-system '(mac ns))
     (exec-path-from-shell-initialize)))
 
+(use-package faust-mode
+  :ensure t
+  :config (setq faust-enable-smie nil)
+  :mode (("\\.dsp$" . faust-mode))
+  :init (setq-local indent-line-function #'js2-indent-line))
+
 (use-package flycheck-clojure
   :ensure t
   :config
   (setq flycheck-highlighting-mode 'columns)
   (eval-after-load 'flycheck '(flycheck-clojure-setup))
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
-  (add-hook 'cider-mode-hook
-            (lambda ()
-              (setq next-error-function #'flycheck-next-error-function))))
+  ;; (add-hook 'cider-mode-hook
+  ;;           (lambda ()
+  ;;             (setq next-error-function #'flycheck-next-error-function)))
+  )
 
 ;; (use-package flycheck-pos-tip
 ;;   :ensure t
@@ -256,7 +263,7 @@
         neo-show-hidden-files t
         neo-cwd-line-style 'none
         neo-click-changes-root t)
-  
+
   (defun neontree-updir ()
     (interactive)
     (prog2
@@ -265,11 +272,11 @@
            (neo-path--updir
             (neo-path--get-working-dir))))
         (next-line 2)))
-  
+
   (add-hook 'neo-enter-hook
             (lambda (type & r) (if (equal type 'file)
                                    (neotree-hide))))
-  
+
   (global-unset-key (kbd "C-x f"))
   (global-set-key (kbd "C-x f") #'neotree)
   (define-key neotree-mode-map
@@ -293,8 +300,16 @@
 
 ;; Highlight matching parenthesis
 (use-package paren
+  :ensure t
   :config
   (show-paren-mode +1))
+
+(use-package projectile
+  :ensure t
+  :config
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (projectile-mode +1))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -305,6 +320,24 @@
 
 (use-package sesman
   :ensure t)
+
+(use-package shell-pop
+  :ensure t
+  :defer t
+  :init
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(shell-pop-shell-type (quote ("eshell" "*eshell*" (lambda nil (eshell)))))
+   '(shell-pop-term-shell "/bin/bash")
+   '(shell-pop-universal-key "C-'")
+   '(shell-pop-window-size 30)
+   '(shell-pop-full-span t)
+   '(shell-pop-window-position "bottom"))
+  (add-hook 'org-mode-hook (lambda ()
+                             (define-key org-mode-map (kbd "C-'") 'shell-pop))))
 
 (use-package smex
   :ensure t
@@ -329,6 +362,47 @@
   (spaceline-emacs-theme))
 
 
+(use-package tabbar-ruler
+  :defer t
+  :ensure t
+  :bind (([C-tab] . tabbar-forward-tab)
+         ([C-S-iso-lefttab] . tabbar-backward-tab)
+         ([C-f4] . kill-current-buffer)
+         ("C-x <right>" . tabbar-forward)
+         ("C-x <left>" . tabbar-backward))
+  :init
+  (progn
+    (setq tabbar-ruler-global-tabbar t)
+    (setq tabbar-ruler-fancy-close-image t)
+    (require 'tabbar-ruler)
+    (global-unset-key (kbd "C-c <C-up>"))
+    (global-unset-key (kbd "C-c <C-down>")))
+  :config
+  (progn
+    (setq left-margin-width 0)
+    (set-fringe-mode 0)
+    (setq right-margin-width 0)
+    (tabbar-ruler-group-by-projectile-project)
+    (custom-set-faces
+     '(tabbar-button ((t (list
+                          :inherit default
+                          :box nil
+                          :height 104
+                          :width normal
+                          :family "Sans Serif"
+                          :foreground "#ffffff"))))
+     '(tabbar-highlight ((t nil)))
+     '(tabbar-selected ((t (list
+                            :inherit default
+                            :stipple nil
+                            :weight normal
+                            :height 150
+                            :width normal
+                            :family "Sans Serif"))))
+     '(tabbar-selected-modified ((t (:inherit tabbar-default :background "#272822" :foreground "tomato" :box nil :height 150 :family "Sans Serif"))))
+     '(tabbar-unselected ((t (:inherit tabbar-selected :background "#444" :foreground "#aaa" :height 160))))
+     '(tabbar-unselected-modified ((t (:inherit tabbar-selected-modified :background "#444")))))))
+
 (use-package typescript-mode
   :ensure t
   :mode (("\\.ts$" . web-mode)
@@ -350,10 +424,28 @@
 (use-package web-mode
   :ensure t
   :config (electric-indent-mode -1)
+  (setq-default web-mode-comment-formats
+                (remove '("javascript" . "/*") web-mode-comment-formats))
+  (add-to-list 'web-mode-comment-formats '("javascript" . "//"))
+  (add-to-list 'web-mode-comment-formats '("typescript" . "//"))
+  (add-to-list 'web-mode-comment-formats '("jsx" . "//"))
   :mode (("\\.ts$" . web-mode)
          ("\\.tsx$" . web-mode)))
+
+;; Auto complete shortcuts
+(use-package which-key
+  :ensure t
+  :defer t
+  :init
+  (which-key-mode 1))
 
 (use-package yasnippet
   :ensure t
   :config (yas-global-mode t)
   (add-hook 'clojure-mode-hook 'yas-minor-mode))
+
+(use-package yaml-mode
+  :ensure t)
+
+(use-package yaml-tomato
+  :ensure t)
