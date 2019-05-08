@@ -39,10 +39,9 @@ fi
 
 # Download init.el, intro and outro text
 $HTTP_CLIENT $tmp_dir/intro.txt https://raw.githubusercontent.com/panaeolus/emacs4art/master/installer/intro.txt
-$HTTP_CLIENT $tmp_dir/outro.txt https://raw.githubusercontent.com/panaeolus/emacs4art/master/installer/outro.txt
 $HTTP_CLIENT $tmp_dir/init.el   https://raw.githubusercontent.com/panaeolus/emacs4art/master/installer/default-init.el
 
-# Print outro and ask for user confirmation to continue
+# Print intro and ask for user confirmation to continue
 echo ""
 echo ""
 echo $(tput setaf 4)
