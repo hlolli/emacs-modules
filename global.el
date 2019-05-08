@@ -65,12 +65,13 @@
       custom-safe-themes t
       create-lockfiles nil
       completion-show-inline-help nil
-      completion-auto-help nil 
+      completion-auto-help nil
       electric-indent-inhibit t
       frame-title-format '((:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b")))
       gc-cons-threshold 20000000
-      help-window-select t 
+      help-window-select t
       inhibit-startup-message t
+      nrepl-use-ssh-fallback-for-remote-hosts t
       nxml-child-indent 4
       nxml-attribute-indent 4
       require-final-newline t

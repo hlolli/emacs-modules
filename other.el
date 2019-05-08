@@ -87,3 +87,7 @@
 
 ;; Delete trailing whitespace on save
 (add-hook 'before-save-hook #'delete-trailing-whitespace nil nil)
+
+;; Enable mouse when in terminal mode
+(when (eq window-system nil)
+  (xterm-mouse-mode t))

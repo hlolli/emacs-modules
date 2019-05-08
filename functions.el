@@ -64,7 +64,7 @@ buffer is not visiting a file."
   (delete-region beg end)
   (yank))
 
-(defun indent-buffer () 
+(defun indent-buffer ()
   "Indent the currently visited buffer."
   (interactive)
   (indent-region (point-min) (point-max)))
@@ -129,26 +129,47 @@ buffer is not visiting a file."
 	    (message "Deleted file %s" filename)
 	    (kill-buffer)))))))
 
+(defun move-file (new-location)
+  "Write this file to NEW-LOCATION, and delete the old one."
+  (interactive (list (expand-file-name
+                      (if buffer-file-name
+                          (read-file-name "Move file to: ")
+                        (read-file-name "Move file to: "
+                                        default-directory
+                                        (expand-file-name (file-name-nondirectory (buffer-name))
+                                                          default-directory))))))
+  (when (file-exists-p new-location)
+    (delete-file new-location))
+  (let ((old-location (expand-file-name (buffer-file-name))))
+    (message "old file is %s and new file is %s"
+             old-location
+             new-location)
+    (write-file new-location t)
+    (when (and old-location
+               (file-exists-p new-location)
+               (not (string-equal old-location new-location)))
+      (delete-file old-location))))
 
 (defun emacs4art-download-fira-mono-font ()
   "Only for initial start"
-  (let* ((font-dest (cl-case window-system
-                      (x  (concat (or (getenv "XDG_DATA_HOME")
-                                      (concat (getenv "HOME") "/.local/share"))
-                                  "/fonts/"))
-                      (mac (concat (getenv "HOME") "/Library/Fonts/" ))
-                      (ns (concat (getenv "HOME") "/Library/Fonts/" ))))
-         (known-dest? (stringp font-dest))
-         (font-dest (or font-dest (read-directory-name "Font installation directory: " "~/"))))
-    (unless (file-directory-p font-dest) (mkdir font-dest t))
-    (url-copy-file "https://github.com/mozilla/Fira/blob/master/ttf/FiraMono-Regular.ttf?raw=true"
-                   (expand-file-name "FiraMono-regular.ttf" font-dest) t)
-    (when known-dest?
-      (message "Fonts downloaded, updating font cache... <fc-cache -f -v> ")
-      (shell-command-to-string (format "fc-cache -f -v")))
-    (message "Successfully %s `Symbola' fonts to `%s'!"
-             (if known-dest? "installed" "downloaded")
-             font-dest)))
+  (when (display-graphic-p)
+    (let* ((font-dest (cl-case window-system
+			(x  (concat (or (getenv "XDG_DATA_HOME")
+					(concat (getenv "HOME") "/.local/share"))
+                                    "/fonts/"))
+			(mac (concat (getenv "HOME") "/Library/Fonts/" ))
+			(ns (concat (getenv "HOME") "/Library/Fonts/" ))))
+           (known-dest? (stringp font-dest))
+           (font-dest (or font-dest (read-directory-name "Font installation directory: " "~/"))))
+      (unless (file-directory-p font-dest) (mkdir font-dest t))
+      (url-copy-file "https://github.com/mozilla/Fira/blob/master/ttf/FiraMono-Regular.ttf?raw=true"
+                     (expand-file-name "FiraMono-regular.ttf" font-dest) t)
+      (when known-dest?
+	(message "Fonts downloaded, updating font cache... <fc-cache -f -v> ")
+	(shell-command-to-string (format "fc-cache -f -v")))
+      (message "Successfully %s `Symbola' fonts to `%s'!"
+	       (if known-dest? "installed" "downloaded")
+	       font-dest))))
 
 
 ;; functions.el ends here

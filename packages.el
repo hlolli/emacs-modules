@@ -55,7 +55,9 @@
                 )
   ;; :init (unbind-key "C-c C-b" 'cider-mode-map)
   :bind (("C-c M-b" . cider-eval-buffer)
-         ("C-c d"   . cider-print-docstring)))
+         ("C-c d"   . cider-print-docstring))
+  :init (eldoc-mode t)
+  (paredit-mode t))
 
 
 (use-package cider-eval-sexp-fu
@@ -64,10 +66,11 @@
 ;; Basic clojure-mode with indent rules etc.
 (use-package clojure-mode
   :ensure t
-  :init (eldoc-mode t)
+  :init
+  (eldoc-mode t)
   (paredit-mode t)
   :config
-  (setq clojure-align-forms-automatically t))
+  (setq clojure-align-forms-automatically nil))
 
 (use-package clojure-mode-extra-font-locking
   :ensure t)
@@ -116,7 +119,7 @@
 ;; Dim Emacs when it's out of focus
 (use-package dimmer
   :ensure t
-  :init (dimmer-mode)
+  :init (when (display-graphic-p) (dimmer-mode))
   :config (setq dimmer-fraction 0.35))
 
 (use-package eshell-git-prompt
@@ -188,6 +191,8 @@
   (setq ido-enable-flex-matching t
         ido-use-faces t))
 
+(use-package gradle-mode
+  :ensure t)
 
 ;; Completions when finding files
 (use-package ido
@@ -351,16 +356,18 @@
   :config
   (set-face-attribute
    'powerline-active2 nil
-   :background "#000000" :foreground "#ffffff"))
+   :background "#3f3f3f" :foreground "#3E3D31"))
 
 (use-package spaceline-all-the-icons
   :ensure t
   :after spaceline
-  :config (spaceline-all-the-icons-theme)
+  :config
+  ;; (spaceline-all-the-icons-theme)
   (setq spaceline-all-the-icons-icon-set-modified 'toggle)
   (require 'spaceline-config)
-  (spaceline-emacs-theme))
-
+  (spaceline-spacemacs-theme)
+  ;; (spaceline-all-the-icons-theme)
+  )
 
 (use-package tabbar-ruler
   :defer t
@@ -372,9 +379,9 @@
          ("C-x <left>" . tabbar-backward))
   :init
   (progn
+    (require 'tabbar-ruler)
     (setq tabbar-ruler-global-tabbar t)
     (setq tabbar-ruler-fancy-close-image t)
-    (require 'tabbar-ruler)
     (global-unset-key (kbd "C-c <C-up>"))
     (global-unset-key (kbd "C-c <C-down>")))
   :config
@@ -429,8 +436,11 @@
   (add-to-list 'web-mode-comment-formats '("javascript" . "//"))
   (add-to-list 'web-mode-comment-formats '("typescript" . "//"))
   (add-to-list 'web-mode-comment-formats '("jsx" . "//"))
-  :mode (("\\.ts$" . web-mode)
-         ("\\.tsx$" . web-mode)))
+  (setq web-mode-content-types-alist
+        '(("jsx" . "\\.js[x]?\\'")))
+  :mode (("\\.ts\\'" . web-mode)
+         ("\\.js\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)))
 
 ;; Auto complete shortcuts
 (use-package which-key
@@ -438,6 +448,11 @@
   :defer t
   :init
   (which-key-mode 1))
+
+(use-package xclip
+  :ensure t
+  :defer t
+  :init (xclip-mode 1))
 
 (use-package yasnippet
   :ensure t

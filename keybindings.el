@@ -2,6 +2,10 @@
 ;; Comment or uncomment region
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region-or-line)
 
+;; Comment or uncomment region - terminal mode
+(global-unset-key (kbd "C-x ;"))
+(global-set-key (kbd "C-x ;") 'comment-or-uncomment-region-or-line)
+
 ;; Resize buffer window
 (global-set-key (kbd "C-c <left>") 'shrink-window-horizontally--double)
 (global-set-key (kbd "C-c <right>") 'enlarge-window-horizontally--double)
@@ -13,9 +17,17 @@
 
 
 ;; quickly move to the beginning or end of buffer
-(global-set-key (kbd "C-<") #'beginning-of-buffer)
-(global-set-key (kbd "C->") #'end-of-buffer)
+(global-set-key (kbd "C->") #'beginning-of-buffer)
+(global-set-key (kbd "C-<") #'end-of-buffer)
+(global-set-key (kbd "C-x C->") #'beginning-of-buffer)
+(global-set-key (kbd "C-x C-<") #'end-of-buffer)
 
+
+;; quickly move to beginning or end in terminal mode
+(global-unset-key (kbd "C-x <"))
+(global-unset-key (kbd "C-x >"))
+(global-set-key (kbd "C-x >") #'beginning-of-buffer)
+(global-set-key (kbd "C-x <") #'end-of-buffer)
 
 ;; Vim style increment and decrement
 ;; (global-unset-key (kbd "C-x <down>"))
