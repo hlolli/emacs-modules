@@ -38,9 +38,9 @@ if type -p curl >/dev/null 2>&1; then
 fi
 
 # Download init.el, intro and outro text
-$HTTP_CLIENT $tmp_dir/intro.txt https://raw.github.com/overtone/emacs4art/master/installer/intro.txt
-$HTTP_CLIENT $tmp_dir/outro.txt https://raw.github.com/overtone/emacs4art/master/installer/outro.txt
-$HTTP_CLIENT $tmp_dir/init.el   https://raw.github.com/overtone/emacs4art/master/installer/default-init.el
+$HTTP_CLIENT $tmp_dir/intro.txt https://raw.githubusercontent.com/panaeolus/emacs4art/master/installer/intro.txt
+$HTTP_CLIENT $tmp_dir/outro.txt https://raw.githubusercontent.com/panaeolus/emacs4art/master/installer/outro.txt
+$HTTP_CLIENT $tmp_dir/init.el   https://raw.githubusercontent.com/panaeolus/emacs4art/master/installer/default-init.el
 
 # Print outro and ask for user confirmation to continue
 echo ""
@@ -162,8 +162,8 @@ To revert back to your old Emacs configs simply:
 
 ;; Here below you can put your own configuration
 ;; for tips and tricks, go to https://github.com/panaeolus/emacs4art
-" > ~/.emacs.d/init.el 
-    
+" > ~/.emacs.d/init.el
+
     rm -rf $tmp_dir
 
 else
