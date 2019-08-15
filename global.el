@@ -1,10 +1,8 @@
 
 ;; Built-in modes config
-(add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
 (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
 (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'lisp-interaction-mode-hook #'emacs-lisp-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
 (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
 
 ;; Disable blinking cursor
@@ -46,12 +44,14 @@
 
 ;; Try to load emacs4art-font it exists
 (let ((default-font (if (member emacs4art-font (font-family-list))
-                        emacs4art-font "DejaVu Sans Mono")))
+                        emacs4art-font
+                      (if (member "PT Mono" (font-family-list))
+                          "PT Mono" "Arial"))))
   (unless (member "Fira Mono" (font-family-list))
     (emacs4art-download-fira-mono-font))
   (set-face-attribute 'default nil
                       :font default-font
-                      :height 120
+                      :height 180
                       :weight 'normal
                       :width 'normal)
   ;; Enlarge just a tiny bit
@@ -66,7 +66,7 @@
       create-lockfiles nil
       completion-show-inline-help nil
       completion-auto-help nil
-      electric-indent-inhibit t
+      electric-indent-mode t
       frame-title-format '((:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b")))
       gc-cons-threshold 20000000
       help-window-select t

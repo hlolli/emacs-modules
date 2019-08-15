@@ -56,8 +56,7 @@
   ;; :init (unbind-key "C-c C-b" 'cider-mode-map)
   :bind (("C-c M-b" . cider-eval-buffer)
          ("C-c d"   . cider-print-docstring))
-  :init (eldoc-mode t)
-  (paredit-mode t))
+  :init (paredit-mode t))
 
 
 (use-package cider-eval-sexp-fu
@@ -67,8 +66,8 @@
 (use-package clojure-mode
   :ensure t
   :init
-  (eldoc-mode t)
   (paredit-mode t)
+  (electric-indent-mode t)
   :config
   (setq clojure-align-forms-automatically nil))
 
@@ -150,16 +149,16 @@
   :mode (("\\.dsp$" . faust-mode))
   :init (setq-local indent-line-function #'js2-indent-line))
 
-(use-package flycheck-clojure
-  :ensure t
-  :config
-  (setq flycheck-highlighting-mode 'columns)
-  (eval-after-load 'flycheck '(flycheck-clojure-setup))
-  ;; (add-hook 'after-init-hook #'global-flycheck-mode)
-  ;; (add-hook 'cider-mode-hook
-  ;;           (lambda ()
-  ;;             (setq next-error-function #'flycheck-next-error-function)))
-  )
+;; (use-package flycheck-clojure
+;;   :ensure t
+;;   :config
+;;   (setq flycheck-highlighting-mode 'columns)
+;;   (eval-after-load 'flycheck '(flycheck-clojure-setup))
+;;   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+;;   ;; (add-hook 'cider-mode-hook
+;;   ;;           (lambda ()
+;;   ;;             (setq next-error-function #'flycheck-next-error-function)))
+;;   )
 
 ;; (use-package flycheck-pos-tip
 ;;   :ensure t
@@ -344,6 +343,9 @@
   (add-hook 'org-mode-hook (lambda ()
                              (define-key org-mode-map (kbd "C-'") 'shell-pop))))
 
+(use-package shut-up
+  :ensure t)
+
 (use-package smex
   :ensure t
   :bind ("M-x" . smex)
@@ -430,9 +432,8 @@
 
 (use-package web-mode
   :ensure t
-  :config (electric-indent-mode -1)
-  (setq-default web-mode-comment-formats
-                (remove '("javascript" . "/*") web-mode-comment-formats))
+  :config  (setq-default web-mode-comment-formats
+                         (remove '("javascript" . "/*") web-mode-comment-formats))
   (add-to-list 'web-mode-comment-formats '("javascript" . "//"))
   (add-to-list 'web-mode-comment-formats '("typescript" . "//"))
   (add-to-list 'web-mode-comment-formats '("jsx" . "//"))

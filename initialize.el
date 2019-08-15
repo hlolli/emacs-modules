@@ -8,7 +8,7 @@
   :type 'string)
 
 (defcustom emacs4art-font "Fira Mono"
-  "The global font, if not found, 
+  "The global font, if not found,
    then defaults to `DejaVu Sans Mono'"
   :group 'emacs4art
   :type 'string)
@@ -62,5 +62,11 @@
 ;; Load other extras
 (load-file (expand-file-name "other.el" emacs4art-location))
 
+;; Load third-party libraries
+(load-file
+ (expand-file-name
+  "yarn.el"
+  (concat (file-name-as-directory  emacs4art-location)
+          "third-party")))
 
 ;; initialize.el ends here
