@@ -68,8 +68,24 @@
   :init
   (paredit-mode t)
   (electric-indent-mode t)
+  (eldoc-mode t)
   :config
-  (setq clojure-align-forms-automatically nil))
+  (setq clojure-align-forms-automatically nil)
+  (define-clojure-indent
+    (defroutes 'defun)
+    (GET 2)
+    (POST 2)
+    (PUT 2)
+    (DELETE 2)
+    (HEAD 2)
+    (ANY 2)
+    (OPTIONS 2)
+    (PATCH 2)
+    (rfn 2)
+    (let-routes 1)
+    (context 2)
+    (wait-for 'defun)
+    (animation/start 2)))
 
 (use-package clojure-mode-extra-font-locking
   :ensure t)
@@ -286,6 +302,10 @@
   (define-key neotree-mode-map
     (kbd "<backspace>")
     'neontree-updir))
+
+(use-package nix-mode
+  :ensure t
+  :mode "\\.nix\\'")
 
 ;; Paredit mode for structural editing
 ;; makes sure the brackets always match

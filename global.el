@@ -41,6 +41,8 @@
 ;; Use ibuffer instead of buffer-list
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
+;; Auto revert (saved) files when they change on disk
+(global-auto-revert-mode t)
 
 ;; Try to load emacs4art-font it exists
 (let ((default-font (if (member emacs4art-font (font-family-list))
