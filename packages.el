@@ -369,8 +369,12 @@
   :config
   (show-paren-mode +1))
 
+(defvar-local prettier-location
+  (concat emacs-modules-location "/third-party"))
+
 (use-package prettier-js
-  :ensure t
+  :ensure nil
+  :load-path prettier-location
   :config
   (eval-after-load 'js2-mode
     (lambda ()
@@ -378,14 +382,14 @@
               (locate-dominating-file default-directory ".prettierrc.json"))
           (progn
             (add-hook 'js2-mode-hook #'add-node-modules-path)
-            (add-hook 'js2-mode-hook #'prettier-mode--disabled-on-ssh)))))
+            (add-hook 'js2-mode-hook #'hlolli/prettier-mode--disabled-on-ssh)))))
   (eval-after-load 'web-mode
     (lambda ()
       (if (or (locate-dominating-file default-directory ".prettierrc")
               (locate-dominating-file default-directory ".prettierrc.json"))
           (progn
             (add-hook 'web-mode-hook #'add-node-modules-path)
-            (add-hook 'web-mode-hook #'prettier-mode--disabled-on-ssh))))))
+            (add-hook 'web-mode-hook #'hlolli/prettier-mode--disabled-on-ssh))))))
 
 (use-package projectile
   :ensure t
