@@ -1,19 +1,19 @@
-(defgroup emacs4art nil
+(defgroup hlolli nil
   "Maintain a menu of recently opened files."
   :version "1.0.0")
 
-(defcustom emacs4art-location (concat user-emacs-directory "emacs4art")
-  "Directory location of Emacs 4 artists, defaults to ~/.emacs.d/emacs4art"
-  :group 'emacs4art
+(defcustom emacs-modules-location (concat user-emacs-directory "emacs-modules")
+  "Directory location of Emacs 4 artists, defaults to ~/.emacs.d/emacs-modules"
+  :group 'hlolli
   :type 'string)
 
-(defcustom emacs4art-font "Fira Mono"
+(defcustom emacs-modules-font "Fira Mono"
   "The global font, if not found,
    then defaults to `DejaVu Sans Mono'"
-  :group 'emacs4art
+  :group 'hlolli
   :type 'string)
 
-(defvar emacs4art-first-run-p nil)
+(defvar emacs-modules-first-run-p nil)
 
 (require 'package)
 (require 'cl)
@@ -37,7 +37,7 @@
 
 ;; First run of this emacs config
 (when (not (package-installed-p 'use-package))
-  (setq emacs4art-first-run-p t)
+  (setq emacs-modules-first-run-p t)
   (package-refresh-contents)
   (package-install 'use-package)
   ;; create tmp dir
@@ -50,25 +50,25 @@
   (require 'use-package))
 
 ;; Load packages
-(load-file (expand-file-name "packages.el" emacs4art-location))
+(load-file (expand-file-name "packages.el" emacs-modules-location))
 
 ;; Load functions
-(load-file (expand-file-name "functions.el" emacs4art-location))
+(load-file (expand-file-name "functions.el" emacs-modules-location))
 
 ;; Load keybindings
-(load-file (expand-file-name "keybindings.el" emacs4art-location))
+(load-file (expand-file-name "keybindings.el" emacs-modules-location))
 
 ;; Load global config
-(load-file (expand-file-name "global.el" emacs4art-location))
+(load-file (expand-file-name "global.el" emacs-modules-location))
 
 ;; Load other extras
-(load-file (expand-file-name "other.el" emacs4art-location))
+(load-file (expand-file-name "other.el" emacs-modules-location))
 
 ;; Load third-party libraries
 (load-file
  (expand-file-name
   "yarn.el"
-  (concat (file-name-as-directory  emacs4art-location)
+  (concat (file-name-as-directory  emacs-modules-location)
           "third-party")))
 
 ;; initialize.el ends here

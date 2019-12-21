@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/env bash
 
-# Emacs4art Installer based on Sam Aaron's Emacs-Live installer
+# emacs-modules Installer based on Sam Aaron's Emacs-Live installer
 # Written by Hlöðver Sigurðsson <hlolli@gmail.com>
 # May, 2018
 

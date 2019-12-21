@@ -44,13 +44,13 @@
 ;; Auto revert (saved) files when they change on disk
 (global-auto-revert-mode t)
 
-;; Try to load emacs4art-font it exists
-(let ((default-font (if (member emacs4art-font (font-family-list))
-                        emacs4art-font
+;; Try to load emacs-modules-font it exists
+(let ((default-font (if (member emacs-modules-font (font-family-list))
+                        emacs-modules-font
                       (if (member "PT Mono" (font-family-list))
                           "PT Mono" "Arial"))))
   (unless (member "Fira Mono" (font-family-list))
-    (emacs4art-download-fira-mono-font))
+    (emacs-modules-download-fira-mono-font))
   (set-face-attribute 'default nil
                       :font default-font
                       :height 180

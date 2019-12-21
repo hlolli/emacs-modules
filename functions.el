@@ -1,5 +1,5 @@
 
-(defun comment-or-uncomment-region-or-line ()
+(defun hlolli/comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region."
   (interactive)
   (let (beg end)
@@ -9,7 +9,7 @@
     (comment-or-uncomment-region beg end)))
 
 ;; Vim style increment
-(defun increment-number-decimal (&optional arg)
+(defun hlolli/increment-number-decimal (&optional arg)
   "Increment the number forward from point by 'arg'."
   (interactive "p*")
   (save-excursion
@@ -25,11 +25,11 @@
           (replace-match (format (concat "%0" (int-to-string field-width) "d")
                                  answer)))))))
 
-(defun decrement-number-decimal (&optional arg)
+(defun hlolli/decrement-number-decimal (&optional arg)
   (interactive "p*")
   (increment-number-decimal (if arg (- arg) -2)))
 
-(defun sudo-edit (&optional arg)
+(defun hlolli/sudo-edit (&optional arg)
   "Edit currently visited file as root.
 With a prefix ARG prompt for a file to visit.
 Will also prompt for a file to visit if current
@@ -41,41 +41,41 @@ buffer is not visiting a file."
     (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
 ;; Resize the buffer window if more than 1 is in view
-(defun enlarge-window-horizontally--double ()
+(defun hlolli/enlarge-window-horizontally--double ()
   (interactive)
   (enlarge-window-horizontally 10))
 
-(defun shrink-window-horizontally--double ()
+(defun hlolli/shrink-window-horizontally--double ()
   (interactive)
   (shrink-window-horizontally 10))
 
-(defun shrink-window--double ()
+(defun hlolli/shrink-window--double ()
   (interactive)
   (shrink-window 10))
 
-(defun enlarge-window--double ()
+(defun hlolli/enlarge-window--double ()
   (interactive)
   (enlarge-window 10))
 
 ;; replace the selected region with yank
-(defun yank-replace (beg end)
+(defun hlolli/yank-replace (beg end)
   (interactive "r")
   (delete-region beg end)
   (yank))
 
-(defun indent-buffer ()
+(defun hlolli/indent-buffer ()
   "Indent the currently visited buffer."
   (interactive)
   (indent-region (point-min) (point-max)))
 
-(defun chomp (str)
+(defun hlolli/chomp (str)
   "Chomp leading and tailing whitespace from STR."
   (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
                        str)
     (setq str (replace-match "" t t str)))
   str)
 
-(defun chomp-line-or-region ()
+(defun hlolli/chomp-line-or-region ()
   "Remove leading and traling whitespace from current line or region."
   (interactive)
   (let (pos1 pos2 bds)
@@ -90,7 +90,7 @@ buffer is not visiting a file."
     (goto-char pos1)
     (insert myStrChomped)))
 
-(defun echo-active-modes ()
+(defun hlolli/echo-active-modes ()
   "Give a message of which minor modes are enabled in the current buffer."
   (interactive)
   (let ((active-modes))
@@ -101,8 +101,7 @@ buffer is not visiting a file."
           minor-mode-list)
     (message "Active modes are %s" active-modes)))
 
-
-(defun rename-file-and-buffer ()
+(defun hlolli/rename-file-and-buffer ()
   "Rename the current buffer and file it is visiting."
   (interactive)
   (let ((filename (buffer-file-name)))
@@ -110,15 +109,9 @@ buffer is not visiting a file."
         (message "Buffer is not visiting a file!")
       (let ((new-name (read-file-name "New name: " filename)))
         (rename-file filename new-name t)
-        (set-visited-file-name new-name t t)
-        ;; (cond
-        ;;  ((vc-backend filename) (vc-rename-file filename new-name))
-        ;;  (t
-        ;;   (rename-file filename new-name t)
-        ;;   (set-visited-file-name new-name t t)))
-        ))))
+        (set-visited-file-name new-name t t)))))
 
-(defun delete-file-and-buffer ()
+(defun hlolli/delete-file-and-buffer ()
   "Kill the current buffer and deletes the file it is visiting."
   (interactive)
   (let ((filename (buffer-file-name)))
@@ -131,7 +124,7 @@ buffer is not visiting a file."
 	    (message "Deleted file %s" filename)
 	    (kill-buffer)))))))
 
-(defun move-file (new-location)
+(defun hlolli/move-file (new-location)
   "Write this file to NEW-LOCATION, and delete the old one."
   (interactive (list (expand-file-name
                       (if buffer-file-name
@@ -152,7 +145,7 @@ buffer is not visiting a file."
                (not (string-equal old-location new-location)))
       (delete-file old-location))))
 
-(defun emacs4art-download-fira-mono-font ()
+(defun hlolli/emacs-modules-download-fira-mono-font ()
   "Only for initial start"
   (when (display-graphic-p)
     (let* ((font-dest (cl-case window-system
@@ -173,7 +166,7 @@ buffer is not visiting a file."
 	       (if known-dest? "installed" "downloaded")
 	       font-dest))))
 
-(defun yank-github-link ()
+(defun hlolli/yank-github-link ()
   "Quickly share a github link of what you are seeing in a buffer. Yanks
 a link you can paste in the browser."
   (interactive)
@@ -189,7 +182,7 @@ a link you can paste in the browser."
                        (count-lines 1 (point)))))
     (kill-new link)))
 
-(defun prettier-mode--disabled-on-ssh ()
+(defun hlolli/prettier-mode--disabled-on-ssh ()
   (when (not (and (eq 'string (type-of (buffer-file-name)))
                   (string-equal
                    "/scp" (substring-no-properties
@@ -198,7 +191,7 @@ a link you can paste in the browser."
     (prettier-js-mode)
     (run-with-idle-timer 1 nil (lambda () (font-lock-flush)))))
 
-(defun camel-to-snake-case-region ()
+(defun hlolli/camel-to-snake-case-region ()
   (interactive)
   (progn (replace-regexp "\\([A-Z]\\)" "_\\1" nil (region-beginning) (region-end))
          (downcase-region (region-beginning) (region-end))))

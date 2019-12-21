@@ -1,5 +1,5 @@
 ;; WARNING: Anything modified in this file will be automatically removed!
-;; Every time emacs4art autoupdates, it will replace all the files with
+;; Every time emacs-modules autoupdates, it will replace all the files with
 ;; the newest version from github. If you wish to supress this behaviour
 ;; please add (setq hlolli/emacs-modules-autoupdate-p nil) to your init.el
 

@@ -12,7 +12,7 @@
 (use-package all-the-icons
   :ensure t
   :config
-  (when emacs4art-first-run-p
+  (when emacs-modules-first-run-p
     (all-the-icons-install-fonts t)))
 
 (use-package autodisass-java-bytecode
