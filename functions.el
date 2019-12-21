@@ -40,7 +40,6 @@ buffer is not visiting a file."
                          (ido-read-file-name "Find file(as root): ")))
     (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
-
 ;; Resize the buffer window if more than 1 is in view
 (defun enlarge-window-horizontally--double ()
   (interactive)
@@ -110,11 +109,14 @@ buffer is not visiting a file."
     (if (not (and filename (file-exists-p filename)))
         (message "Buffer is not visiting a file!")
       (let ((new-name (read-file-name "New name: " filename)))
-        (cond
-         ((vc-backend filename) (vc-rename-file filename new-name))
-         (t
-          (rename-file filename new-name t)
-          (set-visited-file-name new-name t t)))))))
+        (rename-file filename new-name t)
+        (set-visited-file-name new-name t t)
+        ;; (cond
+        ;;  ((vc-backend filename) (vc-rename-file filename new-name))
+        ;;  (t
+        ;;   (rename-file filename new-name t)
+        ;;   (set-visited-file-name new-name t t)))
+        ))))
 
 (defun delete-file-and-buffer ()
   "Kill the current buffer and deletes the file it is visiting."
@@ -186,5 +188,19 @@ a link you can paste in the browser."
                        (magit-current-file)
                        (count-lines 1 (point)))))
     (kill-new link)))
+
+(defun prettier-mode--disabled-on-ssh ()
+  (when (not (and (eq 'string (type-of (buffer-file-name)))
+                  (string-equal
+                   "/scp" (substring-no-properties
+                           (buffer-file-name)
+                           0 4))))
+    (prettier-js-mode)
+    (run-with-idle-timer 1 nil (lambda () (font-lock-flush)))))
+
+(defun camel-to-snake-case-region ()
+  (interactive)
+  (progn (replace-regexp "\\([A-Z]\\)" "_\\1" nil (region-beginning) (region-end))
+         (downcase-region (region-beginning) (region-end))))
 
 ;; functions.el ends here

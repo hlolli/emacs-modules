@@ -76,13 +76,20 @@
       nrepl-use-ssh-fallback-for-remote-hosts t
       nxml-child-indent 4
       nxml-attribute-indent 4
+      package-check-signature nil
       require-final-newline t
       ring-bell-function 'ignore
       savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
-      savehist-file (concat user-emacs-directory "tmp/savehist"))
+      savehist-file (concat user-emacs-directory "tmp/savehist")
+      use-package-always-defer t
+      use-package-always-ensure t
+      use-package-check-before-init t)
 
 
 ;; Never make tabs (exception for Makefiles)
 (setq-default indent-tabs-mode nil)
+
+;; Load the file containing variable customization
+(load custom-file)
 
 ;; globalvars.el ends here

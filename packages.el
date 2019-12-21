@@ -1,11 +1,13 @@
+(use-package add-node-modules-path
+  :ensure t)
 
 ;; Automatic indentation mode
 (use-package aggressive-indent
   :ensure t
   :config (global-aggressive-indent-mode t)
   (setq aggressive-indent-excluded-modes
-        (cons 'cider-repl-mode aggressive-indent-excluded-modes)))
-
+        (append aggressive-indent-excluded-modes
+                (list 'cider-repl-mode 'java-mode 'web-mode))))
 
 (use-package all-the-icons
   :ensure t
@@ -13,7 +15,11 @@
   (when emacs4art-first-run-p
     (all-the-icons-install-fonts t)))
 
-;; Every 4 days, try updateing the packages
+(use-package autodisass-java-bytecode
+  :ensure t
+  :defer t)
+
+;; Every 4 days, try updating the packages
 (use-package auto-package-update
   :disabled
   ;; :ensure t
@@ -29,15 +35,16 @@
   )
 
 
-(use-package autopair
-  :ensure t
-  :init (dolist
-            (mode '(c-mode
-                    json-mode js-mode
-                    csound-mode c++-mode
-                    typescript-mode web-mode))
-          (add-hook (intern (concat (symbol-name mode) "-hook"))
-                    (lambda () (autopair-mode 1)))))
+;; (use-package autopair
+;;   :ensure t
+;;   :init (dolist
+;;             (mode '(c-mode
+;;                     json-mode js-mode
+;;                     ;; csound-mode
+;;                     c++-mode
+;;                     typescript-mode web-mode))
+;;           (add-hook (intern (concat (symbol-name mode) "-hook"))
+;;                     (lambda () (autopair-mode 1)))))
 
 
 ;; The swiss-army knife for Clojure development
@@ -70,22 +77,7 @@
   (electric-indent-mode t)
   (eldoc-mode t)
   :config
-  (setq clojure-align-forms-automatically nil)
-  (define-clojure-indent
-    (defroutes 'defun)
-    (GET 2)
-    (POST 2)
-    (PUT 2)
-    (DELETE 2)
-    (HEAD 2)
-    (ANY 2)
-    (OPTIONS 2)
-    (PATCH 2)
-    (rfn 2)
-    (let-routes 1)
-    (context 2)
-    (wait-for 'defun)
-    (animation/start 2)))
+  (setq clojure-align-forms-automatically nil))
 
 (use-package clojure-mode-extra-font-locking
   :ensure t)
@@ -111,13 +103,11 @@
   :mode (("CMakeLists.txt" . cmake-mode)
          ("\\.cmake\\'"    . cmake-mode)))
 
-(use-package csound-mode
-  :disabled
-  :ensure t
-  :mode (("\\.csd\\'" . csound-mode)
-         ("\\.orc\\'" . csound-mode)
-         ("\\.sco\\'" . csound-mode)
-         ("\\.udo\\'" . csound-mode)))
+;; (use-package csound-mode
+;;   :mode (("\\.csd\\'" . csound-mode)
+;;          ("\\.orc\\'" . csound-mode)
+;;          ("\\.sco\\'" . csound-mode)
+;;          ("\\.udo\\'" . csound-mode)))
 
 (use-package css-mode
   :ensure t)
@@ -209,6 +199,15 @@
 (use-package gradle-mode
   :ensure t)
 
+(use-package google-c-style
+  :defer t
+  :ensure t
+  :commands
+  (google-set-c-style))
+
+(use-package highlight-symbol
+  :ensure t)
+
 ;; Completions when finding files
 (use-package ido
   :ensure t
@@ -255,15 +254,25 @@
   (set-face-attribute 'ido-vertical-match-face nil
                       :foreground "#000000"
                       ))
+(use-package interaction-log
+  :ensure t
+  :init
+  (global-set-key
+   (kbd "C-h C-l")
+   (lambda ()
+     (interactive)
+     (require 'interaction-log)
+     (when (not ilog-recent-commands)
+       (interaction-log-mode +1))
+     (display-buffer ilog-buffer-name))))
 
 (use-package json-mode
   :ensure t
   :mode (("\\.json\\'" . json-mode))
-  :config (add-hook 'json-mode-hook
-                    (lambda ()
-                      (make-local-variable 'js-indent-level)
-                      (setq js-indent-level 2))))
-
+  :init (add-hook 'json-mode-hook
+                  (lambda ()
+                    (make-local-variable 'js-indent-level)
+                    (setq js-indent-level 2))))
 
 ;; powerful git management
 ;; docs: https://magit.vc/manual/magit/
@@ -271,7 +280,39 @@
   :ensure t
   :config (global-magit-file-mode)
   :bind (("C-x g"   . magit-status)
-         ("C-x M-g" . magit-dispatch-popup)))
+	 ("C-x M-g" . magit-dispatch-popup)))
+
+(use-package meghanada
+  :defer t
+  :init
+  (add-hook 'java-mode-hook
+            (lambda ()
+              (google-set-c-style)
+              (google-make-newline-indent)
+              (meghanada-mode t)
+              (smartparens-mode t)
+              (rainbow-delimiters-mode t)
+              (highlight-symbol-mode t)
+              (add-hook 'before-save-hook 'meghanada-code-beautify-before-save)))
+
+  :config
+  (use-package realgud
+    :ensure t)
+  (setq indent-tabs-mode nil)
+  (setq tab-width 2)
+  (setq c-basic-offset 2)
+  (setq meghanada-server-remote-debug t)
+  (setq meghanada-javac-xlint "-Xlint:all,-processing")
+  :bind
+  (:map meghanada-mode-map
+        ("C-S-t" . meghanada-switch-testcase)
+        ("M-RET" . meghanada-local-variable)
+        ("C-M-." . helm-imenu)
+        ("M-r" . meghanada-reference)
+        ("M-t" . meghanada-typeinfo)
+        ("C-z" . hydra-meghanada/body))
+  :commands
+  (meghanada-mode))
 
 ;; Semi-graphical file explorer
 (use-package neotree
@@ -328,6 +369,24 @@
   :config
   (show-paren-mode +1))
 
+(use-package prettier-js
+  :ensure t
+  :config
+  (eval-after-load 'js2-mode
+    (lambda ()
+      (if (or (locate-dominating-file default-directory ".prettierrc")
+              (locate-dominating-file default-directory ".prettierrc.json"))
+          (progn
+            (add-hook 'js2-mode-hook #'add-node-modules-path)
+            (add-hook 'js2-mode-hook #'prettier-mode--disabled-on-ssh)))))
+  (eval-after-load 'web-mode
+    (lambda ()
+      (if (or (locate-dominating-file default-directory ".prettierrc")
+              (locate-dominating-file default-directory ".prettierrc.json"))
+          (progn
+            (add-hook 'web-mode-hook #'add-node-modules-path)
+            (add-hook 'web-mode-hook #'prettier-mode--disabled-on-ssh))))))
+
 (use-package projectile
   :ensure t
   :config
@@ -343,6 +402,9 @@
   (add-hook 'cider-repl-mode #'rainbow-delimiters-mode))
 
 (use-package sesman
+  :ensure t)
+
+(use-package smartparens
   :ensure t)
 
 (use-package shell-pop
@@ -432,19 +494,34 @@
      '(tabbar-unselected ((t (:inherit tabbar-selected :background "#444" :foreground "#aaa" :height 160))))
      '(tabbar-unselected-modified ((t (:inherit tabbar-selected-modified :background "#444")))))))
 
+(use-package tern
+  :ensure t
+  :defer t
+  :config
+  (eval-after-load 'js2-mode
+    (lambda ()
+      (tern-mode-enable))))
+
 (use-package typescript-mode
   :ensure t
   :mode (("\\.ts$" . web-mode)
          ("\\.tsx$" . web-mode)))
 
+(defun setup-tide-mode ()
+  "Set up Tide mode."
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
 (use-package tide
   :ensure t
-  :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save))
-  :mode (("\\.ts$" . web-mode)
-         ("\\.tsx$" . web-mode)))
+  :config
+  (setq company-tooltip-align-annotations t)
+  (add-hook 'typescript-mode-hook #'setup-tide-mode))
 
 (use-package undo-tree
   :ensure t
@@ -452,15 +529,36 @@
 
 (use-package web-mode
   :ensure t
+  :init
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (smartparens-mode t)
+              (rainbow-delimiters-mode t)
+              (highlight-symbol-mode t)
+              (when (or (string-equal "jsx" (file-name-extension buffer-file-name))
+                        (string-equal "js" (file-name-extension buffer-file-name)))
+                (require 'js2-mode)
+                (js2-minor-mode t)
+                (tern-mode t)
+                (setq-local web-mode-content-type "jsx")
+                (add-to-list 'company-backends 'company-tern)
+                (add-to-list 'xref-backend-functions 'xref-js2-xref-backend))
+              (when (or (string-equal "tsx" (file-name-extension buffer-file-name))
+                        (string-equal "ts" (file-name-extension buffer-file-name)))
+                (setup-tide-mode))))
   :config  (setq-default web-mode-comment-formats
-                         (remove '("javascript" . "/*") web-mode-comment-formats))
+                         (remove '("javascript" . "/*") web-mode-comment-formats)
+                         web-mode-enable-auto-quoting nil
+                         js2-include-jslint-globals nil)
   (add-to-list 'web-mode-comment-formats '("javascript" . "//"))
   (add-to-list 'web-mode-comment-formats '("typescript" . "//"))
   (add-to-list 'web-mode-comment-formats '("jsx" . "//"))
-  (setq web-mode-content-types-alist
-        '(("jsx" . "\\.js[x]?\\'")))
+  (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
   :mode (("\\.ts\\'" . web-mode)
          ("\\.js\\'" . web-mode)
+         ("\\.jsx\\'" . web-mode)
+         ("\\.css\\'" . web-mode)
+         ("\\.scss\\'" . web-mode)
          ("\\.tsx\\'" . web-mode)))
 
 ;; Auto complete shortcuts
@@ -474,6 +572,10 @@
   :ensure t
   :defer t
   :init (xclip-mode 1))
+
+(use-package xref-js2
+  :ensure t
+  :defer t)
 
 (use-package yasnippet
   :ensure t

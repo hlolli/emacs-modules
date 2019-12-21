@@ -1,22 +1,22 @@
 #!/bin/bash
 
-# Emacs4art autoupdate script
+# Emacs-Modules autoupdate script
 # Intended to be called from within emacs
-# $ bash update-script.sh /path/to/emacs4art
+# $ bash update-script.sh /path/to/emacs-modules
 # Written by Hlöðver Sigurðsson <hlolli@gmail.com>
 # May, 2018
 
-emacs4art_directory=$1
+emacs_modules_directory=$1
 username=$(whoami)
-tmp_dir=~/.emacs-4art-tmp
+tmp_dir=~/.emacs-modules-tmp
 git_changed=0
 
-if [ -z "$emacs4art_directory" ]; then
-    echo "No parameter for emacs4art directory location"
+if [ -z "$emacs-modules_directory" ]; then
+    echo "No parameter for emacs-modules directory location"
     exit 0
 fi
 
-# Make sure there's write access to the emacs4art directory
+# Make sure there's write access to the emacs-modules directory
 # https://stackoverflow.com/a/14104522
 
 INFO=( $(stat -L -c "%a %G %U" $DIR) )
@@ -45,7 +45,7 @@ elif (( ($PERM & 0200) != 0 )); then
 fi
 
 if [$ACCESS -eq 0]; then
-    echo "No write access, not updateing emacs4art"
+    echo "No write access, not updateing emacs-modules"
     exit 0
 fi
 
@@ -59,7 +59,7 @@ mkdir $tmp_dir
 git --version 2>&1 >/dev/null # improvement by tripleee
 GIT_IS_AVAILABLE=$?
 
-# When git is present, see if emacs4art
+# When git is present, see if emacs-modules
 # directory has a git tracker
 HAS_DOT_GIT=0
 
@@ -80,27 +80,27 @@ fi
 
 function download_tarball {
     echo ""
-    echo $(tput setaf 2)"--> Downloading emacs4art..."$(tput sgr0)
+    echo $(tput setaf 2)"--> Downloading emacs-modules..."$(tput sgr0)
     echo ""
-    $HTTP_CLIENT $tmp_dir/emacs4art.zip https://github.com/panaeolus/emacs4art/zipball/master
+    $HTTP_CLIENT $tmp_dir/emacs-modules.zip https://github.com/panaeolus/emacs-modules/zipball/master
 
     # Unzip zipball
-    unzip $tmp_dir/emacs4art.zip -d $tmp_dir/
+    unzip $tmp_dir/emacs-modules.zip -d $tmp_dir/
 
     # Copy over the new files
-    cp -rf $tmp_dir/emacs4art/* $emacs4art_directory
+    cp -rf $tmp_dir/emacs-modules/* $emacs-modules_directory
 
 }
 
 
 function git_clone {
     echo ""
-    echo $(tput setaf 2)"--> Cloning emacs4art..."$(tput sgr0)
+    echo $(tput setaf 2)"--> Cloning emacs-modules..."$(tput sgr0)
     echo ""
-    git clone https://github.com/panaeolus/emacs4art.git $tmp_dir/emacs4art
+    git clone https://github.com/panaeolus/emacs-modules.git $tmp_dir/emacs-modules
 
     # Copy over the new files
-    cp -rf $tmp_dir/emacs4art/* $emacs4art_directory
+    cp -rf $tmp_dir/emacs-modules/* $emacs_modules_directory
 
 }
 
@@ -117,6 +117,3 @@ elif [ $GIT_IS_AVAILABLE -eq 0 ]; then
 else
     download_tarball
 fi
-
-
-
