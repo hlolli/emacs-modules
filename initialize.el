@@ -49,11 +49,11 @@
 (eval-when-compile
   (require 'use-package))
 
-;; Load packages
-(load-file (expand-file-name "packages.el" emacs-modules-location))
-
 ;; Load functions
 (load-file (expand-file-name "functions.el" emacs-modules-location))
+
+;; Load packages
+(load-file (expand-file-name "packages.el" emacs-modules-location))
 
 ;; Load keybindings
 (load-file (expand-file-name "keybindings.el" emacs-modules-location))

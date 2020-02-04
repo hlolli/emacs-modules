@@ -7,7 +7,7 @@
   :config (global-aggressive-indent-mode t)
   (setq aggressive-indent-excluded-modes
         (append aggressive-indent-excluded-modes
-                (list 'cider-repl-mode 'java-mode 'web-mode))))
+                (list 'cider-repl-mode 'java-mode 'js-mode 'web-mode))))
 
 (use-package all-the-icons
   :ensure t
@@ -33,19 +33,6 @@
         )
   ;;(auto-package-update-maybe)
   )
-
-
-;; (use-package autopair
-;;   :ensure t
-;;   :init (dolist
-;;             (mode '(c-mode
-;;                     json-mode js-mode
-;;                     ;; csound-mode
-;;                     c++-mode
-;;                     typescript-mode web-mode))
-;;           (add-hook (intern (concat (symbol-name mode) "-hook"))
-;;                     (lambda () (autopair-mode 1)))))
-
 
 ;; The swiss-army knife for Clojure development
 (use-package cider
@@ -98,34 +85,56 @@
   :config
   (add-to-list 'company-backends 'company-tern))
 
+(use-package company-box
+  :ensure t
+  :hook (company-mode . company-box-mode))
+
+(use-package company-flx
+  :ensure t
+  :after company
+  :config
+  (company-flx-mode +1)
+  )
+
 (use-package cmake-mode
   :ensure t
   :mode (("CMakeLists.txt" . cmake-mode)
          ("\\.cmake\\'"    . cmake-mode)))
 
-;; (use-package csound-mode
-;;   :mode (("\\.csd\\'" . csound-mode)
-;;          ("\\.orc\\'" . csound-mode)
-;;          ("\\.sco\\'" . csound-mode)
-;;          ("\\.udo\\'" . csound-mode)))
-
 (use-package css-mode
   :ensure t)
 
-;; :box '(:line-width -1 :color "#4c83ff")
 ;; Let's use the default Emacs-Live theme
 (use-package cyberpunk-theme
   :ensure t
   :config
   (when (display-graphic-p)
-    (load-theme 'cyberpunk t)))
+    (load-theme 'cyberpunk t)
+    (custom-set-faces
+     '(ido-subdir ((t (:foreground "#999999" :background "#0A0A0A"))))
+     '(company-tooltip ((t (:background "#0C1021"  :foreground "#F8F8F8"))))
+     '(js2-function-call ((t (:foreground "#6a5acd"))))
+     '(js2-warning ((t (:foreground "#ff69b4"))))
+     '(js2-warning-face ((t (:foreground "#ff69b4"))))
+     '(js2-error ((t (:foreground "#ff69b4")))
+                 ;; ((t (:foreground "#8b0000")))
+                 )
+     '(js2-error-face ((t (:foreground "#ff69b4")))
+                      ;; ((t (:foreground "#8b0000")))
+                      )
+     '(js2-external-variable-face ((t (:foreground "#ffff00"))))
+     '(js2-external-variable ((t (:foreground "#ffff00"))))
+     )))
 
 
 ;; Dim Emacs when it's out of focus
-(use-package dimmer
-  :ensure t
-  :init (when (display-graphic-p) (dimmer-mode))
-  :config (setq dimmer-fraction 0.35))
+;; (use-package dimmer
+;;   :ensure t
+;;   :init (when (display-graphic-p) (dimmer-mode))
+;;   :config
+;;   (setq dimmer-fraction 0.35)
+;;   (setq dimmer-exclusion-regexp
+;;         "^\*helm.*\\|^ \*Minibuf-.*\\|^ \*Echo.*\\|^ts-.*\\|.*\\.tsx?$\\|.*\\.jsx?$"))
 
 (use-package eshell-git-prompt
   :ensure t :defer t
@@ -152,35 +161,7 @@
 (use-package faust-mode
   :ensure t
   :config (setq faust-enable-smie nil)
-  :mode (("\\.dsp$" . faust-mode))
-  :init (setq-local indent-line-function #'js2-indent-line))
-
-;; (use-package flycheck-clojure
-;;   :ensure t
-;;   :config
-;;   (setq flycheck-highlighting-mode 'columns)
-;;   (eval-after-load 'flycheck '(flycheck-clojure-setup))
-;;   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
-;;   ;; (add-hook 'cider-mode-hook
-;;   ;;           (lambda ()
-;;   ;;             (setq next-error-function #'flycheck-next-error-function)))
-;;   )
-
-;; (use-package flycheck-pos-tip
-;;   :ensure t
-;;   :config
-;;   (eval-after-load 'flycheck
-;;     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
-
-
-;; (use-package flycheck-status-emoji
-;;   :ensure t
-;;   :init
-;;   (unless (member "Symbola" (font-family-list))
-;;     (download-symbola-font))
-;;   (set-fontset-font "fontset-default" nil
-;;                     (font-spec :size 20 :name "Symbola"))
-;;   (flycheck-status-emoji-mode t))
+  :mode (("\\.dsp$" . faust-mode)))
 
 (use-package flycheck-color-mode-line
   :ensure t
@@ -254,6 +235,7 @@
   (set-face-attribute 'ido-vertical-match-face nil
                       :foreground "#000000"
                       ))
+
 (use-package interaction-log
   :ensure t
   :init
@@ -266,6 +248,42 @@
        (interaction-log-mode +1))
      (display-buffer ilog-buffer-name))))
 
+(add-to-list 'auto-mode-alist `("\\.ts$" . js-mode))
+(add-to-list 'auto-mode-alist `("\\.tsx$" . js-mode))
+
+(use-package js2-mode
+  :ensure t
+  :config (setq js2-mode-show-parse-errors nil
+                js2-mode-show-strict-warnings nil
+                js2-strict-missing-semi-warning nil
+                js2-missing-semi-one-line-override nil
+                js2-mode-show-parse-errors nil
+                js2-strict-inconsistent-return-warning nil
+                js2-strict-cond-assign-warning nil
+                js2-strict-var-redeclaration-warning nil
+                js2-strict-var-hides-function-arg-warning nil
+                js2-highlight-external-variables nil
+                js2-include-jslint-globals nil
+                js2-include-jslint-declaration-externs nil
+                ;; js-mode
+                js-jsx-syntax t
+                )
+  ;; :bind  (("M-." . 'js2-jump-to-defenition))
+  :init
+  ;; (define-key js-mode-map
+  ;;   (kbd "M-.")
+  ;;   'js2-jump-to-defenition)
+  (add-hook 'js-mode-hook
+            (lambda ()
+              (js2-minor-mode)
+              (hlolli/set-javascript-indent-from-prettier)
+              (prettier-js-mode)
+              (smartparens-mode t)
+              (rainbow-delimiters-mode t)
+              (rainbow-mode t)
+              (highlight-symbol-mode t)
+              (lsp))))
+
 (use-package json-mode
   :ensure t
   :mode (("\\.json\\'" . json-mode))
@@ -274,11 +292,63 @@
                     (make-local-variable 'js-indent-level)
                     (setq js-indent-level 2))))
 
+;; LSP
+(use-package lsp-ui :ensure t :commands lsp-ui-mode)
+(use-package company-lsp :ensure t :commands company-lsp)
+(use-package helm-lsp :ensure t :commands helm-lsp-workspace-symbol)
+(use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
+(use-package lsp-mode
+  :ensure t
+  :commands lsp
+  :config (setq lsp-eldoc-render-all t
+                lsp-enable-completion-at-point t
+                lsp-enable-indentation t
+                lsp-enable-semantic-highlighting t
+                lsp-enable-xref t
+                lsp-enable-text-document-color t
+                lsp-prefer-flymake :none
+                lsp-ui-doc-enable nil)
+  (add-to-list 'lsp-language-id-configuration
+               '(".*.tsx?" . "typescript"))
+  :init
+
+  ;; (add-hook 'lsp-after-initialize-hook)
+  ;; (add-hook 'js-mode-hook
+  ;;           (lambda ()
+  ;;             (hlolli/set-javascript-indent-from-prettier)
+  ;;             (prettier-js-mode)
+  ;;             (smartparens-mode t)
+  ;;             (rainbow-delimiters-mode t)
+  ;;             (rainbow-mode t)
+  ;;             (highlight-symbol-mode t)
+  ;; (js-jsx-mode)
+  ;; (web-mode)
+
+  ;; (require 'web-mode)
+  ;; (setq web-mode-content-type "jsx"
+  ;;       language "jsx"
+  ;;       font-lock-support-mode nil
+  ;;       font-lock-defaults
+  ;;       '(web-mode-font-lock-keywords t)
+  ;;       font-lock-extend-region-functions
+  ;;       '(web-mode-extend-region)
+  ;;       font-lock-unfontify-region-function
+  ;;       'font-lock-default-unfontify-region
+  ;;       font-lock-fontify-region-function
+  ;;       (lambda (reg-beg reg-end &optional depth)
+  ;;         (web-mode-part-highlight beg end)
+  ;;         (web-mode-highlight-tags reg-beg reg-end)
+  ;;         (web-mode-tag-highlight reg-beg reg-end)
+  ;;         (web-mode-process-parts beg end 'web-mode-part-highlight)))
+  ;; ))
+  )
+
 ;; powerful git management
 ;; docs: https://magit.vc/manual/magit/
 (use-package magit
   :ensure t
   :config (global-magit-file-mode)
+  :hook magit-find-file
   :bind (("C-x g"   . magit-status)
 	 ("C-x M-g" . magit-dispatch-popup)))
 
@@ -376,20 +446,13 @@
   :ensure nil
   :load-path prettier-location
   :config
-  (eval-after-load 'js2-mode
+  (eval-after-load 'js-mode
     (lambda ()
       (if (or (locate-dominating-file default-directory ".prettierrc")
               (locate-dominating-file default-directory ".prettierrc.json"))
           (progn
-            (add-hook 'js2-mode-hook #'add-node-modules-path)
-            (add-hook 'js2-mode-hook #'hlolli/prettier-mode--disabled-on-ssh)))))
-  (eval-after-load 'web-mode
-    (lambda ()
-      (if (or (locate-dominating-file default-directory ".prettierrc")
-              (locate-dominating-file default-directory ".prettierrc.json"))
-          (progn
-            (add-hook 'web-mode-hook #'add-node-modules-path)
-            (add-hook 'web-mode-hook #'hlolli/prettier-mode--disabled-on-ssh))))))
+            (add-hook 'js-mode-hook #'add-node-modules-path)
+            (add-hook 'js-mode-hook #'hlolli/prettier-mode--disabled-on-ssh))))))
 
 (use-package projectile
   :ensure t
@@ -397,6 +460,9 @@
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1))
+
+(use-package rainbow-mode
+  :ensure t)
 
 (use-package rainbow-delimiters
   :ensure t
@@ -498,72 +564,113 @@
      '(tabbar-unselected ((t (:inherit tabbar-selected :background "#444" :foreground "#aaa" :height 160))))
      '(tabbar-unselected-modified ((t (:inherit tabbar-selected-modified :background "#444")))))))
 
-(use-package tern
-  :ensure t
-  :defer t
-  :config
-  (eval-after-load 'js2-mode
-    (lambda ()
-      (tern-mode-enable))))
+;; (use-package tern
+;;   :ensure t
+;;   :defer t
+;;   :config
+;;   (eval-after-load 'web-mode
+;;     (lambda ()
+;;       (tern-mode-enable))))
 
 (use-package typescript-mode
   :ensure t
-  :mode (("\\.ts$" . web-mode)
-         ("\\.tsx$" . web-mode)))
+  :hook (typescript-mode . (lambda ()
+                             (lsp)
+                             (electric-indent-local-mode t)
+                             (smartparens-mode 1)
+                             (rainbow-delimiters-mode t)
+                             (rainbow-mode t)
+                             (highlight-symbol-mode t)
+                             (prettier-js-mode)))
+  ;; :mode (("\\.ts$" . typescript-mode)
+  ;;        ("\\.tsx$" . typescript-mode))
+  )
 
-(defun setup-tide-mode ()
-  "Set up Tide mode."
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save-mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (company-mode +1))
-
-(use-package tide
-  :ensure t
-  :config
-  (setq company-tooltip-align-annotations t)
-  (add-hook 'typescript-mode-hook #'setup-tide-mode))
+;; (defun setup-tide-mode ()
+;;   "Set up Tide mode."
+;;   (interactive)
+;;   (tide-setup)
+;;   (flycheck-mode +1)
+;;   (setq flycheck-check-syntax-automatically '(save-mode-enabled))
+;;   (eldoc-mode +1)
+;;   (tide-hl-identifier-mode +1)
+;;   (company-mode +1))
+;; (use-package tide
+;;   :ensure t
+;;   :config
+;;   (setq company-tooltip-align-annotations t)
+;;   (add-hook 'typescript-mode-hook #'setup-tide-mode))
 
 (use-package undo-tree
   :ensure t
+  :defer t
   :config  (global-undo-tree-mode))
 
 (use-package web-mode
   :ensure t
+  :defer t
   :init
+  ;; (add-hook 'js-mode-hook 'web-mode)
+  ;; (add-hook 'js-mode-hook 'hlolli/set-javascript-indent-from-prettier)
+  (add-hook 'web-mode-hook 'hlolli/set-javascript-indent-from-prettier)
+  ;; (hlolli/replace-alist-mode auto-mode-alist 'js-mode 'web-mode)
+  ;; (hlolli/replace-alist-mode auto-mode-alist 'mhtml-mode 'web-mode)
   (add-hook 'web-mode-hook
             (lambda ()
-              (smartparens-mode t)
-              (rainbow-delimiters-mode t)
-              (highlight-symbol-mode t)
-              (when (or (string-equal "jsx" (file-name-extension buffer-file-name))
-                        (string-equal "js" (file-name-extension buffer-file-name)))
-                (require 'js2-mode)
-                (js2-minor-mode t)
-                (tern-mode t)
-                (setq-local web-mode-content-type "jsx")
-                (add-to-list 'company-backends 'company-tern)
-                (add-to-list 'xref-backend-functions 'xref-js2-xref-backend))
-              (when (or (string-equal "tsx" (file-name-extension buffer-file-name))
-                        (string-equal "ts" (file-name-extension buffer-file-name)))
-                (setup-tide-mode))))
+              (let ((ext (or (file-name-extension (if (stringp buffer-file-name) buffer-file-name "")))))
+                (electric-indent-local-mode t)
+                (paredit-everywhere-mode 1)
+                (rainbow-delimiters-mode t)
+                (rainbow-mode t)
+                (highlight-symbol-mode t)
+                (prettier-js-mode)
+                ;; (when (or (string-equal "jsx" ext)
+                ;;           (string-equal "js" ext)
+                ;;           (string-equal "tsx" ext)
+                ;;           (string-equal "ts" ext))
+                ;;   (lsp)
+                ;;   (setq web-mode-enable-auto-opening nil
+                ;;         web-mode-enable-auto-indentation nil
+                ;;         web-mode-enable-control-block-indentation nil
+                ;;         web-mode-auto-close-style nil
+                ;;         web-mode-auto-quote-style nil)
+                ;;   (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
+                ;;   (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
+                ;;   (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
+                ;;   (add-to-list 'web-mode-indentation-params '("lineup-quotes" . nil))
+                ;;   (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
+                ;;   (add-to-list 'web-mode-indentation-params '("case-extra-offset" . nil))
+                ;;   (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
+                ;;   (add-hook 'before-save-hook
+                ;;             (lambda ()
+                ;;               (web-mode-highlight-region (point-min) (point-max)))
+                ;;             nil 'local)
+                ;;   ;; (tern-mode t)
+                ;;   ;; (setq-local web-mode-content-type "jsx")
+                ;;   ;; (add-to-list 'company-backends 'company-tern)
+                ;;   )
+                ;; (when (or (string-equal "tsx" ext)
+                ;;           (string-equal "ts" ext))
+                ;;   (setup-tide-mode))
+                )))
   :config  (setq-default web-mode-comment-formats
                          (remove '("javascript" . "/*") web-mode-comment-formats)
-                         web-mode-enable-auto-quoting nil
-                         js2-include-jslint-globals nil)
+                         web-mode-enable-auto-quoting nil)
   (add-to-list 'web-mode-comment-formats '("javascript" . "//"))
   (add-to-list 'web-mode-comment-formats '("typescript" . "//"))
   (add-to-list 'web-mode-comment-formats '("jsx" . "//"))
   (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-  :mode (("\\.ts\\'" . web-mode)
-         ("\\.js\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.css\\'" . web-mode)
-         ("\\.scss\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)))
+  :mode (
+         ;; ("\\.ts$" . web-mode)
+         ;; ("\\.js$" . web-mode)
+         ;; ("\\.jsx$" . web-mode)
+         ("\\.css$" . web-mode)
+         ("\\.scss$" . web-mode)
+         ("\\.json$" . web-mode)
+         ("\\.html$" . web-mode)
+         ("\\.php$" . web-mode)
+         ;; ("\\.tsx$" . web-mode)
+         ))
 
 ;; Auto complete shortcuts
 (use-package which-key
@@ -576,10 +683,6 @@
   :ensure t
   :defer t
   :init (xclip-mode 1))
-
-(use-package xref-js2
-  :ensure t
-  :defer t)
 
 (use-package yasnippet
   :ensure t

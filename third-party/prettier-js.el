@@ -64,7 +64,7 @@
   :type '(repeat string)
   :group 'prettier-js)
 
-(defcustom prettier-js-show-errors 'nil
+(defcustom prettier-js-show-errors 'echo
   "Where to display prettier error output.
 It can either be displayed in its own buffer, in the echo area, or not at all.
 Please note that Emacs outputs to the echo area when writing
@@ -172,6 +172,7 @@ a `before-save-hook'."
          (coding-system-for-write 'utf-8)
          (localname (or (file-remote-p buffer-file-name 'localname) buffer-file-name))
          (pre-run-column (current-column))
+         (pre-run-line (line-number-at-pos))
          (width-args
           (cond
            ((equal prettier-js-width-mode 'window)
@@ -211,6 +212,7 @@ a `before-save-hook'."
       (delete-file errorfile)
       (delete-file bufferfile)
       (delete-file outputfile)
+      (goto-line pre-run-line)
       (forward-char
        (min pre-run-column
             (1- (- (line-end-position)

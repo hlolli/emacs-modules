@@ -1,3 +1,10 @@
+;; Disable ctrl-m, use ctrl-j instead
+(global-unset-key (kbd "C-t"))
+
+(global-unset-key (kbd "C-x ."))
+
+;; Disable annoying suspense-frame
+(global-unset-key (kbd "C-x C-z"))
 
 ;; Comment or uncomment region
 (global-set-key (kbd "C-;") 'hlolli/comment-or-uncomment-region-or-line)
@@ -41,6 +48,9 @@
 ;; Use tabbar binding for these keybindings
 (global-unset-key (kbd "C-x <right>"))
 (global-unset-key (kbd "C-x <left>"))
+
+;; Git grep feature introduced in emacs27
+(global-set-key (kbd "C-x p") 'vc-git-grep-template)
 
 ;; Macos meta key fix
 (when (eq system-type 'darwin)

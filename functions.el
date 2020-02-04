@@ -1,3 +1,9 @@
+(require 'json)
+
+(defun hlolli/replace-alist-mode (alist oldmode newmode)
+  (dolist (aitem alist)
+    (if (eq (cdr aitem) oldmode)
+        (setcdr aitem newmode))))
 
 (defun hlolli/comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region."
@@ -117,12 +123,10 @@ buffer is not visiting a file."
   (let ((filename (buffer-file-name)))
     (when filename
       (when (yes-or-no-p (format "Are you sure you want to delete? %s" filename))
-	(if (vc-backend filename)
-	    (vc-delete-file filename)
-	  (progn
-	    (delete-file filename)
-	    (message "Deleted file %s" filename)
-	    (kill-buffer)))))))
+	(progn
+          (delete-file filename)
+          (message "Deleted file %s" filename)
+          (kill-buffer))))))
 
 (defun hlolli/move-file (new-location)
   "Write this file to NEW-LOCATION, and delete the old one."
@@ -195,5 +199,33 @@ a link you can paste in the browser."
   (interactive)
   (progn (replace-regexp "\\([A-Z]\\)" "_\\1" nil (region-beginning) (region-end))
          (downcase-region (region-beginning) (region-end))))
+
+(defun hlolli/set-javascript-indent-from-prettier ()
+  (interactive)
+  (progn
+    (let* ((prettier-dir-with-json (locate-dominating-file default-directory ".prettierrc.json"))
+           (prettier-dir-wo-json (locate-dominating-file default-directory ".prettierrc"))
+           (prettier-json (or (and prettier-dir-with-json (concat prettier-dir-with-json ".prettierrc.json"))
+                              (and prettier-dir-wo-json (concat prettier-dir-wo-json ".prettierrc")))))
+      (when (and prettier-json (file-exists-p prettier-json))
+        (let ((prettier-list (json-read-file prettier-json))
+              (index 0)
+              (result nil))
+          (while (and (< index (length prettier-list))
+                      (eq result nil))
+            (when (eq 'tabWidth (car (nth index prettier-list)))
+              (setq-local result (cdr (nth index prettier-list))))
+            (setq-local index (1+ index)))
+          (setq js-indent-level result
+                js2-basic-offset result
+                web-mode-markup-indent-offset result
+                web-mode-code-indent-offset result))))))
+
+(defun stop-using-minibuffer ()
+  "kill the minibuffer"
+  (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
+    (abort-recursive-edit)))
+
+(add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
 
 ;; functions.el ends here

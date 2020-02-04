@@ -69,8 +69,11 @@
       completion-show-inline-help nil
       completion-auto-help nil
       electric-indent-mode t
-      frame-title-format '((:eval (if (buffer-file-name) (abbreviate-file-name (buffer-file-name)) "%b")))
+      frame-title-format '((:eval
+                            (if (buffer-file-name)
+                                (abbreviate-file-name (buffer-file-name)) "%b")))
       gc-cons-threshold 20000000
+      large-file-warning-threshold 1000000 ;; 1MB
       help-window-select t
       inhibit-startup-message t
       nrepl-use-ssh-fallback-for-remote-hosts t
@@ -81,6 +84,8 @@
       ring-bell-function 'ignore
       savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
       savehist-file (concat user-emacs-directory "tmp/savehist")
+      set-mark-command-repeat-pop t
+      transient-mark-mode nil
       use-package-always-defer t
       use-package-always-ensure t
       use-package-check-before-init t)
