@@ -3,11 +3,11 @@
 
 ;; Automatic indentation mode
 (use-package aggressive-indent
+  :disabled
   :ensure t
-  :config (global-aggressive-indent-mode t)
   (setq aggressive-indent-excluded-modes
         (append aggressive-indent-excluded-modes
-                (list 'cider-repl-mode 'java-mode 'web-mode))))
+                (list 'c-mode 'clojure-mode 'cider-repl-mode 'java-mode 'js-mode 'web-mode))))
 
 (use-package all-the-icons
   :ensure t
@@ -33,18 +33,6 @@
         )
   ;;(auto-package-update-maybe)
   )
-
-
-;; (use-package autopair
-;;   :ensure t
-;;   :init (dolist
-;;             (mode '(c-mode
-;;                     json-mode js-mode
-;;                     ;; csound-mode
-;;                     c++-mode
-;;                     typescript-mode web-mode))
-;;           (add-hook (intern (concat (symbol-name mode) "-hook"))
-;;                     (lambda () (autopair-mode 1)))))
 
 
 ;; The swiss-army knife for Clojure development
@@ -93,10 +81,16 @@
   :config
   (global-company-mode))
 
-(use-package company-tern
+(use-package company-box
   :ensure t
+  :hook (company-mode . company-box-mode))
+
+(use-package company-flx
+  :ensure t
+  :after company
   :config
-  (add-to-list 'company-backends 'company-tern))
+  (company-flx-mode +1)
+  )
 
 (use-package cmake-mode
   :ensure t
@@ -120,12 +114,15 @@
   (when (display-graphic-p)
     (load-theme 'cyberpunk t)))
 
-
-;; Dim Emacs when it's out of focus
-(use-package dimmer
+(use-package direnv
   :ensure t
-  :init (when (display-graphic-p) (dimmer-mode))
-  :config (setq dimmer-fraction 0.35))
+  :config
+  (direnv-mode))
+
+(use-package diff-hl
+  :ensure t
+  :init (global-diff-hl-mode)
+  (diff-hl-margin-mode))
 
 (use-package eshell-git-prompt
   :ensure t :defer t
@@ -142,6 +139,22 @@
   (add-hook 'emacs-lisp-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
   (add-hook 'clojure-mode-hook #'turn-on-eval-sexp-fu-flash-mode)
   (add-hook 'cider-repl-mode-hook #'turn-on-eval-sexp-fu-flash-mode))
+
+(use-package eyebrowse
+  :ensure t
+  :config
+  (define-key eyebrowse-mode-map (kbd "M-0") 'eyebrowse-switch-to-window-config-0)
+  (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+  (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+  (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+  (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
+  (define-key eyebrowse-mode-map (kbd "M-5") 'eyebrowse-switch-to-window-config-5)
+  (define-key eyebrowse-mode-map (kbd "M-6") 'eyebrowse-switch-to-window-config-6)
+  (define-key eyebrowse-mode-map (kbd "M-7") 'eyebrowse-switch-to-window-config-7)
+  (define-key eyebrowse-mode-map (kbd "M-8") 'eyebrowse-switch-to-window-config-8)
+  (define-key eyebrowse-mode-map (kbd "M-9") 'eyebrowse-switch-to-window-config-9)
+  (setq eyebrowse-new-workspace t)
+  :init (eyebrowse-mode 1))
 
 (use-package exec-path-from-shell
   :ensure t
@@ -220,6 +233,7 @@
         ido-use-filename-at-point nil
         ido-auto-merge-work-directories-length -1
         ido-use-virtual-buffers t
+        ido-max-work-file-list 500
         ido-save-directory-list-file
         (expand-file-name "ido.hist" (concat user-emacs-directory "tmp/")))
   ;; Block annoying ido popup on space
@@ -266,6 +280,43 @@
        (interaction-log-mode +1))
      (display-buffer ilog-buffer-name))))
 
+(add-to-list 'auto-mode-alist `("\\.ts$" . js-mode))
+(add-to-list 'auto-mode-alist `("\\.tsx$" . js-mode))
+
+(use-package js2-mode
+  :disabled
+  ;; :ensure t
+  :config (setq js2-mode-show-parse-errors nil
+                js2-mode-show-strict-warnings nil
+                js2-strict-missing-semi-warning nil
+                js2-missing-semi-one-line-override nil
+                js2-mode-show-parse-errors nil
+                js2-strict-inconsistent-return-warning nil
+                js2-strict-cond-assign-warning nil
+                js2-strict-var-redeclaration-warning nil
+                js2-strict-var-hides-function-arg-warning nil
+                js2-highlight-external-variables nil
+                js2-include-jslint-globals nil
+                js2-include-jslint-declaration-externs nil
+                ;; js-mode
+                js-jsx-syntax t
+                )
+  ;; :bind  (("M-." . 'js2-jump-to-defenition))
+  :init
+  ;; (define-key js-mode-map
+  ;;   (kbd "M-.")
+  ;;   'js2-jump-to-defenition)
+  (add-hook 'js-mode-hook
+            (lambda ()
+              (js2-minor-mode)
+              (hlolli/set-javascript-indent-from-prettier)
+              (prettier-js-mode)
+              (smartparens-mode t)
+              (rainbow-delimiters-mode t)
+              (rainbow-mode t)
+              (highlight-symbol-mode t)
+              (lsp))))
+
 (use-package json-mode
   :ensure t
   :mode (("\\.json\\'" . json-mode))
@@ -274,11 +325,41 @@
                     (make-local-variable 'js-indent-level)
                     (setq js-indent-level 2))))
 
+(use-package key-chord
+  :ensure t)
+
+;; LSP
+(use-package lsp-ui :ensure t :commands lsp-ui-mode)
+(use-package company-lsp :ensure t :commands company-lsp)
+(use-package helm-lsp :ensure t :commands helm-lsp-workspace-symbol)
+(use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
+(use-package lsp-mode
+  :ensure t
+  :commands lsp
+  :config (setq lsp-eldoc-render-all t
+                lsp-enable-completion-at-point t
+                lsp-enable-indentation nil
+                lsp-enable-semantic-highlighting t
+                lsp-enable-xref t
+                lsp-enable-text-document-color t
+                lsp-prefer-flymake :none
+                lsp-diagnostics-provider: :none
+                lsp-enable-on-type-formatting nil
+                lsp-ui-doc-enable nil)
+  (add-to-list 'lsp-language-id-configuration
+               '(".*.tsx?" . "typescript"))
+  (add-to-list 'lsp-language-id-configuration
+               '(".*.jsx?" . "typescript"))
+  :init
+  )
+
 ;; powerful git management
 ;; docs: https://magit.vc/manual/magit/
 (use-package magit
   :ensure t
   :config (global-magit-file-mode)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  :hook magit-find-file
   :bind (("C-x g"   . magit-status)
 	 ("C-x M-g" . magit-dispatch-popup)))
 
@@ -293,7 +374,9 @@
               (smartparens-mode t)
               (rainbow-delimiters-mode t)
               (highlight-symbol-mode t)
-              (add-hook 'before-save-hook 'meghanada-code-beautify-before-save)))
+              (setq c-basic-offset 4)
+              ;; (add-hook 'before-save-hook 'meghanada-code-beautify-before-save)
+              ))
 
   :config
   (use-package realgud
@@ -313,6 +396,13 @@
         ("C-z" . hydra-meghanada/body))
   :commands
   (meghanada-mode))
+
+(use-package moom
+  :ensure t
+  :init
+  (with-eval-after-load "moom"
+    (with-eval-after-load "org"
+      (add-hook 'moom-font-after-resize-hook #'org-redisplay-inline-images))))
 
 ;; Semi-graphical file explorer
 (use-package neotree
@@ -344,9 +434,10 @@
     (kbd "<backspace>")
     'neontree-updir))
 
-(use-package nix-mode
-  :ensure t
-  :mode "\\.nix\\'")
+;; (use-package nix-mode
+;;   :ensure t
+;;   :mode "\\.nix\\'"
+;;   :config (setq nix-nixfmt-bin "nixpkgs-fmt"))
 
 ;; Paredit mode for structural editing
 ;; makes sure the brackets always match
@@ -369,12 +460,11 @@
   :config
   (show-paren-mode +1))
 
-(defvar-local prettier-location
+(defvar-local third-party-location
   (concat emacs-modules-location "/third-party"))
 
 (use-package prettier-js
-  :ensure nil
-  :load-path prettier-location
+  :ensure t
   :config
   (eval-after-load 'js2-mode
     (lambda ()
@@ -392,7 +482,8 @@
             (add-hook 'web-mode-hook #'hlolli/prettier-mode--disabled-on-ssh))))))
 
 (use-package projectile
-  :ensure t
+  :disabled
+  ;; :ensure t
   :config
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
@@ -457,46 +548,46 @@
   ;; (spaceline-all-the-icons-theme)
   )
 
-(use-package tabbar-ruler
-  :defer t
-  :ensure t
-  :bind (([C-tab] . tabbar-forward-tab)
-         ([C-S-iso-lefttab] . tabbar-backward-tab)
-         ([C-f4] . kill-current-buffer)
-         ("C-x <right>" . tabbar-forward)
-         ("C-x <left>" . tabbar-backward))
-  :init
-  (progn
-    (require 'tabbar-ruler)
-    (setq tabbar-ruler-global-tabbar t)
-    (setq tabbar-ruler-fancy-close-image t)
-    (global-unset-key (kbd "C-c <C-up>"))
-    (global-unset-key (kbd "C-c <C-down>")))
-  :config
-  (progn
-    (setq left-margin-width 0)
-    (set-fringe-mode 0)
-    (setq right-margin-width 0)
-    (tabbar-ruler-group-by-projectile-project)
-    (custom-set-faces
-     '(tabbar-button ((t (list
-                          :inherit default
-                          :box nil
-                          :height 104
-                          :width normal
-                          :family "Sans Serif"
-                          :foreground "#ffffff"))))
-     '(tabbar-highlight ((t nil)))
-     '(tabbar-selected ((t (list
-                            :inherit default
-                            :stipple nil
-                            :weight normal
-                            :height 150
-                            :width normal
-                            :family "Sans Serif"))))
-     '(tabbar-selected-modified ((t (:inherit tabbar-default :background "#272822" :foreground "tomato" :box nil :height 150 :family "Sans Serif"))))
-     '(tabbar-unselected ((t (:inherit tabbar-selected :background "#444" :foreground "#aaa" :height 160))))
-     '(tabbar-unselected-modified ((t (:inherit tabbar-selected-modified :background "#444")))))))
+;; (use-package tabbar-ruler
+;;   :defer t
+;;   :ensure t
+;;   :bind (([C-tab] . tabbar-forward-tab)
+;;          ([C-S-iso-lefttab] . tabbar-backward-tab)
+;;          ([C-f4] . kill-current-buffer)
+;;          ("C-x <right>" . tabbar-forward)
+;;          ("C-x <left>" . tabbar-backward))
+;;   :init
+;;   (progn
+;;     (require 'tabbar-ruler)
+;;     (setq tabbar-ruler-global-tabbar t)
+;;     (setq tabbar-ruler-fancy-close-image t)
+;;     (global-unset-key (kbd "C-c <C-up>"))
+;;     (global-unset-key (kbd "C-c <C-down>")))
+;;   :config
+;;   (progn
+;;     (setq left-margin-width 0)
+;;     (set-fringe-mode 0)
+;;     (setq right-margin-width 0)
+;;     (tabbar-ruler-group-by-projectile-project)
+;;     (custom-set-faces
+;;      '(tabbar-button ((t (list
+;;                           :inherit default
+;;                           :box nil
+;;                           :height 104
+;;                           :width normal
+;;                           :family "Sans Serif"
+;;                           :foreground "#ffffff"))))
+;;      '(tabbar-highlight ((t nil)))
+;;      '(tabbar-selected ((t (list
+;;                             :inherit default
+;;                             :stipple nil
+;;                             :weight normal
+;;                             :height 150
+;;                             :width normal
+;;                             :family "Sans Serif"))))
+;;      '(tabbar-selected-modified ((t (:inherit tabbar-default :background "#272822" :foreground "tomato" :box nil :height 150 :family "Sans Serif"))))
+;;      '(tabbar-unselected ((t (:inherit tabbar-selected :background "#444" :foreground "#aaa" :height 160))))
+;;      '(tabbar-unselected-modified ((t (:inherit tabbar-selected-modified :background "#444")))))))
 
 (use-package tern
   :ensure t
@@ -536,34 +627,36 @@
   :init
   (add-hook 'web-mode-hook
             (lambda ()
-              (smartparens-mode t)
-              (rainbow-delimiters-mode t)
-              (highlight-symbol-mode t)
-              (when (or (string-equal "jsx" (file-name-extension buffer-file-name))
-                        (string-equal "js" (file-name-extension buffer-file-name)))
-                (require 'js2-mode)
-                (js2-minor-mode t)
-                (tern-mode t)
-                (setq-local web-mode-content-type "jsx")
-                (add-to-list 'company-backends 'company-tern)
-                (add-to-list 'xref-backend-functions 'xref-js2-xref-backend))
-              (when (or (string-equal "tsx" (file-name-extension buffer-file-name))
-                        (string-equal "ts" (file-name-extension buffer-file-name)))
-                (setup-tide-mode))))
-  :config  (setq-default web-mode-comment-formats
-                         (remove '("javascript" . "/*") web-mode-comment-formats)
-                         web-mode-enable-auto-quoting nil
-                         js2-include-jslint-globals nil)
+              (let ((ext (or (file-name-extension (if (stringp buffer-file-name) buffer-file-name "")))))
+                (electric-indent-local-mode t)
+                (prettier-js-mode)
+                (smartparens-mode t)
+                (rainbow-delimiters-mode t)
+                (rainbow-mode t)
+                (highlight-symbol-mode t)
+                (prettier-js-mode)
+                (setq-default web-mode-comment-formats
+                              (remove '("javascript" . "/*") web-mode-comment-formats)
+                              web-mode-enable-auto-quoting nil)
+                )))
+  :config (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
   (add-to-list 'web-mode-comment-formats '("javascript" . "//"))
   (add-to-list 'web-mode-comment-formats '("typescript" . "//"))
   (add-to-list 'web-mode-comment-formats '("jsx" . "//"))
-  (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-  :mode (("\\.ts\\'" . web-mode)
-         ("\\.js\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.css\\'" . web-mode)
-         ("\\.scss\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)))
+  (add-to-list 'web-mode-comment-formats '("json" . "//"))
+  :mode (
+         ("\\.ts$" . web-mode)
+         ("\\.js$" . web-mode)
+         ("\\.jsx$" . web-mode)
+         ("\\.json$" . web-mode)
+         ("\\.css$" . web-mode)
+         ("\\.scss$" . web-mode)
+         ("\\.json$" . web-mode)
+         ("\\.html$" . web-mode)
+         ("\\.php$" . web-mode)
+         ("\\.tsx$" . web-mode)
+         (".*babelrc.*" . web-mode)
+         ))
 
 ;; Auto complete shortcuts
 (use-package which-key

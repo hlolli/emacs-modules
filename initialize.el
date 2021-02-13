@@ -24,16 +24,13 @@
 
 (package-initialize)
 
-(exec-path-from-shell-initialize)
+;; (exec-path-from-shell-initialize)
 
 (setq package-archives
       '(("gnu"     . "http://elpa.gnu.org/packages/")
-        ("melpa"   . "http://melpa.milkbox.net/packages/"))
+	("melpa"   . "https://melpa.org/packages/"))
       package-archive-priorities
-      '(("gnu"     . 0)
-        ("melpa"   . 10)))
-
-;; (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+      '(("gnu"     . 0)))
 
 ;; First run of this emacs config
 (when (not (package-installed-p 'use-package))

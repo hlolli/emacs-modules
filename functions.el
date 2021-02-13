@@ -196,4 +196,62 @@ a link you can paste in the browser."
   (progn (replace-regexp "\\([A-Z]\\)" "_\\1" nil (region-beginning) (region-end))
          (downcase-region (region-beginning) (region-end))))
 
+(defun hlolli/set-javascript-indent-from-prettier ()
+  (interactive)
+  (progn
+    (let* ((prettier-dir-with-json (locate-dominating-file default-directory ".prettierrc.json"))
+           (prettier-dir-wo-json (locate-dominating-file default-directory ".prettierrc"))
+           (prettier-json (or (and prettier-dir-with-json (concat prettier-dir-with-json ".prettierrc.json"))
+                              (and prettier-dir-wo-json (concat prettier-dir-wo-json ".prettierrc")))))
+      (when (and prettier-json (file-exists-p prettier-json))
+        (let ((prettier-list (json-read-file prettier-json))
+              (index 0)
+              (result nil))
+          (while (and (< index (length prettier-list))
+                      (eq result nil))
+            (when (eq 'tabWidth (car (nth index prettier-list)))
+              (setq-local result (cdr (nth index prettier-list))))
+            (setq-local index (1+ index)))
+          (setq js-indent-level result
+                js2-basic-offset result
+                web-mode-markup-indent-offset result
+                web-mode-code-indent-offset result))))))
+
+(defun clang-format-buffer-smart ()
+  "Reformat buffer if .clang-format exists in the projectile root."
+  (interactive)
+  (when (file-exists-p (expand-file-name ".clang-format" (projectile-project-root)))
+    (clang-format-buffer)))
+
+(defun stop-using-minibuffer ()
+  "kill the minibuffer"
+  (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
+    (abort-recursive-edit)))
+
+(add-hook 'mouse-leave-buffer-hook 'stop-using-minibuffer)
+
+(defun nix-hl-mode ()
+  (interactive)
+  (progn
+    (require 'nix)
+    (font-lock-mode)
+    (setq-local font-lock-defaults '(nix-font-lock-keywords))
+    (font-lock-flush)))
+
+(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-hl-mode))
+
+(defun hlolli/disable-scroll-bars (frame)
+  (modify-frame-parameters frame
+                           '((vertical-scroll-bars . nil)
+                             (horizontal-scroll-bars . nil))))
+
+(add-hook 'after-make-frame-functions 'hlolli/disable-scroll-bars)
+
+(defun hlolli/delete-trailing-whitespace ()
+  "Delete trailing whitespace except in modes where it
+  makes little sense"
+  (when (not (and (eq 'string (type-of (buffer-file-name)))
+                  (string-match-p ".*\.md$" (buffer-file-name))))
+    (delete-trailing-whitespace)))
+
 ;; functions.el ends here

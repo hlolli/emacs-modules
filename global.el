@@ -53,12 +53,8 @@
     (emacs-modules-download-fira-mono-font))
   (set-face-attribute 'default nil
                       :font default-font
-                      :height 180
-                      :weight 'normal
-                      :width 'normal)
-  ;; Enlarge just a tiny bit
-  (text-scale-adjust +1))
-
+                      :height 140
+                      :weight 'regular))
 
 (setq ac-ignore-case nil
       auto-save-list-file-prefix (concat user-emacs-directory "tmp/auto-save-list/.saves-")
@@ -83,8 +79,11 @@
       savehist-file (concat user-emacs-directory "tmp/savehist")
       use-package-always-defer t
       use-package-always-ensure t
-      use-package-check-before-init t)
-
+      auto-revert-check-vc-info t
+      use-package-check-before-init t
+      left-fringe-width 2
+      column-number-indicator-zero-based nil
+      right-fringe-width 0)
 
 ;; Never make tabs (exception for Makefiles)
 (setq-default indent-tabs-mode nil)
